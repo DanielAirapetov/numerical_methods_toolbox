@@ -28,22 +28,3 @@ def gaussJordanElimination(A):
         x[i] = A[i][m] / A[i][i]
 
     return x
-
-
-m = int(input())
-A = np.zeros((m, m + 1))
-
-for i in range(m):
-    for j in range(m + 1):
-        A[i][j] = float(input())
-
-A_copy = A.copy()
-
-x = gaussJordanElimination(A_copy)
-print(x)
-
-for i in range(m):
-    b = 0
-    for j in range(m):
-        b += (A[i][j] * x[j])
-    print(b)

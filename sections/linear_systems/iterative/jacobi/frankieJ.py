@@ -1,11 +1,12 @@
-def GaussSiedel(arr, start_values, tolerance, flag):
-    A0 = arr[:,:-1].copy()
+import numpy as np
+def Jacobi(arr, start_values, tolerance, flag):
+    A0 = arr[:,:-1].copy() # get copy of original A and b for flag operations
     b0 = arr[:,-1].copy()
     arr = arr.copy()
     i, j = 0, 0 # initalize indeces (rows i, columns j)
     A = arr[:,:-1]
     n = A.shape[0] #get the size of rows and columns
-    m = A.shape[1] 
+    m = A.shape[1]
     while (i < n and j < m):
         maxi = i
         for k in range(i+1, n):
@@ -21,33 +22,37 @@ def GaussSiedel(arr, start_values, tolerance, flag):
     A = arr[:,:-1].copy()
     b = arr[:,-1].copy()  # fixed: take b from arr, not A
     new_x = np.zeros(len(start_values))
-    old_x = np.zeros(len(new_x))
-    
-    for i in range(n):
+
+    for i in range(n): #perform Jacobi method 
         b[i] = b[i]/A[i,i]
         new_x[i] = start_values[i]
-        old_x[i] = new_x[i]
         for j in range(n):
-            if(i!=j):
-                A[i,j] /= A[i,i]
-
-    error = 10           
-    iter = 0              
-    max_iter = 1000       
-
-    while (error > tolerance) and (iter < max_iter):   
-        old_x[:] = new_x  # reset old_x 
-
-        max_error = 0      
+            if (i!=j):
+                A[i,j] = A[i,j]/A[i,i]
+                
+    old_x = np.zeros(len(start_values))
+    error = 10
+    iter = 0
+    max_iter = 1000
+    A0 = arr[:, :-1].copy()
+    b0 = arr[:, -1].copy()
+    while (error > tolerance) and (iter < max_iter):
+        error = 0
         for i in range(n):
+            old_x[i] = new_x[i]
             new_x[i] = b[i]
+        for i in range(n):
             for j in range(n):
-                if(i!=j):
-                    new_x[i] -= A[i,j]*new_x[j]
+                if (i!=j):
+                    new_x[i] = new_x[i] - A[i,j]*old_x[j]
+
+        max_error = 0  # track max across all variables
+        
+        for i in range(n):
             if flag == 1:  # approximate mean abs err
-                curr_err = np.mean(np.abs(new_x[i] - old_x[i]))
+                curr_err = np.mean(np.abs(new_x - old_x))
             elif flag == 2:  # root mean squared err
-                curr_err = np.sqrt(np.mean((new_x[i] - old_x[i])**2))
+                curr_err = np.sqrt(np.mean((new_x - old_x)**2))
             elif flag == 3:  # true mean abs err
                 curr_err = np.mean(np.abs(A0 @ new_x - b0))
             elif flag == 4:  # true rmse
@@ -55,12 +60,12 @@ def GaussSiedel(arr, start_values, tolerance, flag):
             else:
                 curr_err = 0  # avoid undefined vars for invalid flag
 
-            max_error = max(max_error, curr_err)
+            max_error = max(max_error, curr_err)  #
 
-        error = max_error 
+        error = max_error
         iter += 1
 
         if iter >= max_iter and error > tolerance:
-            print("Warning: Gauss-Siedel did not converge (hit max_iter).")
-
-    return new_x, iter  
+            print("Warning: Jacobi did not converge (hit max_iter).")
+    
+    return new_x, iter

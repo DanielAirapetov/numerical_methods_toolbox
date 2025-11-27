@@ -1,59 +1,85 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from sections.linear_systems.direct_elimination.gaussian import frankieG, markG, danielG, jhonG
-from sections.linear_systems.direct_elimination.gauss_jordan import frankieGJ, markGJ, danielGJ, jhonGJ
+import os, sys
 
 
+# Add project ROOT so imports work
+ROOT = os.path.dirname(os.path.dirname(__file__))
+if ROOT not in sys.path:
+    sys.path.append(ROOT)
 
-def printResults(results):
+from sections.linear_systems.direct_elimination.gaussian import frankieG, markG, danielG
+from sections.linear_systems.direct_elimination.gauss_jordan import frankieGJ, markGJ, danielGJ
+from sections.linear_systems.iterative.seidel import frankieGS, danielGS
+from sections.linear_systems.iterative.jacobi import frankieJ, danielJ
+
+def printResults(results, method, member):
+    st.write(f"{method} results using {member}'s function:")
     for i, value in enumerate(results):
         st.write(f"x{i+1} = {value}")
 
-st.title("Directed Elimination Methods Calculator: ")
-method = st.selectbox("Choose a method: ", ["Gaussian", "Gauss-Jordan"])
+def createMatrix():
+    rows = st.number_input("Rows", 1, 10, 3)
+    cols = st.number_input("Columns", 1, 10, 4)
+    st.write("Enter your augmented matrix:")
+    default_df = pd.DataFrame([[0]*int(cols) for _ in range(int(rows))])
+    edited_df = st.data_editor(default_df)
+    return edited_df.to_numpy(dtype=float)
 
-rows = st.number_input("Rows", 1, 10, 3)
-cols = st.number_input("Columns", 1, 10, 4)
+def selectMember():
+    return st.selectbox("Select whose method to use:", ["Daniel", "Francis", "Jhon", "Mark"])
 
-st.write("Enter your augmented matrix: ")
+st.title("Systems of Equations Methods Calculator")
 
-default_df = pd.DataFrame([[0]*int(cols) for _ in range(int(rows))])
+method_type = st.selectbox("Choose a method type:", ["Direct", "Iterative"])
 
-edited_df = st.data_editor(default_df)
+if method_type == "Direct":
+    method = st.selectbox("Choose a method:", ["Gaussian", "Gauss-Jordan"])
+    matrix = createMatrix()
+    member = selectMember()
 
-matrix = edited_df.to_numpy(dtype=float)
-members = ["Daniel", "Francis","Jhon", "Mark"]
-member = st.selectbox("Select group members function to use: ", members)
+    if st.button("Solve Direct"):
+        if member == "Francis":
+            reduced = frankieG.gauss_elim(matrix.copy())
+            resultsG = frankieG.back_sub(reduced)
+            resultsGJ = frankieGJ.GJ_elim(matrix.copy())
+            printResults(resultsG if method == "Gaussian" else resultsGJ, method, member)
 
-if member == "Francis":
-    reducedmat = frankieG.gauss_elim(matrix)
-    resultsG = frankieG.back_sub(reducedmat)
-    resultsGJ = frankieGJ.GJ_elim(matrix)
-    if method == "Gaussian":
-        printResults(resultsG)
-    else:
-        printResults(resultsGJ)
+        elif member == "Mark":
+            resultsG = markG.gaussianEliminationMethod(matrix.copy())
+            resultsGJ = markGJ.gaussJordanElimination(matrix.copy())
+            printResults(resultsG if method == "Gaussian" else resultsGJ, method, member)
 
-elif member == "Mark":
-    resultsG = markG.gaussianEliminationMethod(matrix)
-    resultsGJ = markGJ.gaussJordanElimination(matrix)
-    if method == "Gaussian":
-        printResults(resultsG)
-    else:
-        printResults(resultsGJ)
-  
-elif member == "Daniel":
-    resultsG = danielG.gaussian_elimination(matrix)
-    resultsGJ = danielGJ.gauss_jordan_elimination(matrix)
-    if method == "Gaussian":
-        printResults(resultsG)
-    else:
-        printResults(resultsGJ)
+        elif member == "Daniel":
+            resultsG = danielG.gaussian_elimination(matrix.copy())
+            resultsGJ = danielGJ.gauss_jordan_elimination(matrix.copy())
+            printResults(resultsG if method == "Gaussian" else resultsGJ, method, member)
 
-else:
-    st.write("Still dont have Jhons function")
-    
+        else:
+            st.error("Jhon's methods not implemented yet.")
 
+else:  # Iterative
+    method = st.selectbox("Choose a method:", ["Gauss-Seidel", "Jacobi"])
+    matrix = createMatrix()
+    member = selectMember()
 
+    if st.button("Solve Iterative"):
+        initial = np.zeros(matrix.shape[0])
+        tolerance = 0.001
+        flag = 4
 
+        if member == "Francis":
+            resultsGS, i = frankieGS.GaussSiedel(matrix, initial, tolerance, flag)
+            resultsJ, _ = frankieJ.Jacobi(matrix, initial, tolerance, flag)
+            printResults(resultsGS if method == "Gauss-Seidel" else resultsJ, method, member)
+            st.write("Iterations:", i)
+
+        elif member == "Daniel":
+            resultsGS, i = danielGS.gauss_seidel_iterative_method(matrix, tolerance, flag)
+            resultsJ, _ = danielJ.jacobi_iterative_method(matrix, tolerance, flag)
+            printResults(resultsGS if method == "Gauss-Seidel" else resultsJ, method, member)
+
+        else:
+            st.error("Mark and Jhon's iterative methods not implemented yet.")
+            

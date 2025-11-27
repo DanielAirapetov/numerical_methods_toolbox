@@ -59,8 +59,7 @@ def gauss_seidel_iterative_method(mat, tol, flag):
         for i in range(n):
             new_x[i] = biases[i]
         
-        match flag:
-            case 1:
+        if flag == 1:
                 for j in range(n):
                     for k in range(n):
                         if j != k:
@@ -68,7 +67,7 @@ def gauss_seidel_iterative_method(mat, tol, flag):
                     error += abs(new_x[j] - old_x[j])
                 error /= n
 
-            case 2:
+        elif flag == 2:
                 for j in range(n):
                     for k in range(n):
                         if j != k:
@@ -76,7 +75,7 @@ def gauss_seidel_iterative_method(mat, tol, flag):
                     error += (new_x[j] - old_x[j]) ** 2
                 error = (error / n) ** 0.5 
 
-            case 3:
+        elif flag == 3:
                 for j in range(n):
                     for k in range(n):
                         if j != k:
@@ -88,7 +87,7 @@ def gauss_seidel_iterative_method(mat, tol, flag):
                     error += abs(summation - biases[i])
                 error /= n
 
-            case 4:
+        elif flag == 4:
                 for j in range(n):
                     for k in range(n):
                         if j != k:
@@ -99,7 +98,8 @@ def gauss_seidel_iterative_method(mat, tol, flag):
                         summation += a[i][j] * new_x[j]
                     error += (summation - biases[i]) ** 2
                 error = (error / n) ** 0.5
-
+        else:
+            print("Error: invalid flag")
         iter += 1
         if (iter > 1000): # check if iterations has exceeded a "ridiculous" value (1000)
             print("\nIterations have exceeded 1000, terminating the Gauss-Seidel function.") 
