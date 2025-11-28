@@ -141,13 +141,13 @@ with center_right:
 
         if st.session_state.get("compute_goldenSection", False):
             if member == "Daniel":
-                result, iterations = daniel.goldenSectionMethod(left_bound, right_bound, 0.000001, flag, function_symbolic)
+                result, iterations = daniel.goldenSectionMethod(left_bound, right_bound, delta, flag, function_symbolic)
             elif member == "Jhon":
-                result, iterations = jhon.goldenSectionMethod(left_bound, right_bound, 0.000001, flag, function_symbolic)
+                result, iterations = jhon.goldenSectionMethod(left_bound, right_bound, delta, flag, function_symbolic)
             elif member == "Mark":
-                result, iterations = mark.goldenSectionMethod(left_bound, right_bound, 0.000001, flag, function_symbolic)
+                result, iterations = mark.goldenSectionMethod(left_bound, right_bound, delta, flag, function_symbolic)
             elif member == "Francis":
-                result, iterations = francis.goldenSectionMethod(left_bound, right_bound, 0.000001, flag, function_symbolic)
+                result, iterations = francis.goldenSectionMethod(left_bound, right_bound, delta, flag, function_symbolic)
 
             st.write(f"**{min_max} at:** {result}")
             st.write(f"**Iterations:** {iterations}")

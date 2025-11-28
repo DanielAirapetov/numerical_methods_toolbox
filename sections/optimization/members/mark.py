@@ -2,9 +2,11 @@ import numpy as np
 import sympy as sp
 
 
-x = sp.Symbol('x')
 
-def goldenSectionMethod(a, b, delta, flag, f):
+def goldenSectionMethod(a, b, delta, flag, sym_func):
+
+    x = sp.Symbol('x')
+    f = sp.lambdify(x, sym_func, "numpy")
 
     phi = (1 + np.sqrt(5)) / 2
     error = float('inf')
@@ -17,7 +19,7 @@ def goldenSectionMethod(a, b, delta, flag, f):
     while error > delta and iterations < max_iter:
 
         if flag == 1:
-            if f.subs(x, x1) >= f.subs(x, x2):
+            if f(x1) >= f(x2):
                 a = x1
                 x1 = x2
                 x2 = a + ((b - a) / phi)
@@ -27,7 +29,7 @@ def goldenSectionMethod(a, b, delta, flag, f):
                 x1 = b - ((b - a) / phi)
 
         elif flag == 2:
-            if f.subs(x, x1) <= f.subs(x, x2):
+            if f(x1) <= f(x2):
                 a = x1
                 x1 = x2
                 x2 = a + ((b - a) / phi)
@@ -42,14 +44,21 @@ def goldenSectionMethod(a, b, delta, flag, f):
     return ((a + b) / 2), iterations
 
 
-def newtonMinMaxMethod(x0, f, delta):
+def newtonMinMaxMethod(x0, delta, sym_func):
+
+    x = sp.Symbol('x')
 
     iterations = 0
     max_iter = 1000
     error = float('inf')
 
-    f_first = sp.diff(f, x)
-    f_second = sp.diff(f_first, x)
+    sym_f_first = sp.diff(sym_func, x)
+    sym_f_second = sp.diff(sym_func_first, x)
+
+    f = sp.lambdify(x, sym_func, "numpy")
+    f_first = sp.lambdify(x, sym_f_first, "numpy")
+    f_second = sp.lambdify(x, sym_f_second, "numpy")
+
 
     alpha = 1
 
@@ -61,5 +70,4 @@ def newtonMinMaxMethod(x0, f, delta):
         iterations += 1
 
     return x_next, iterations
-
 
