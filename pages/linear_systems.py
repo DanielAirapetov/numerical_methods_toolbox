@@ -20,24 +20,52 @@ def printResults(results, method, member):
         st.write(f"x{i+1} = {value}")
 
 def createMatrix():
-    rows = st.number_input("Rows", 1, 10, 3)
-    cols = st.number_input("Columns", 1, 10, 4)
-    st.write("Enter your augmented matrix:")
-    default_df = pd.DataFrame([[0]*int(cols) for _ in range(int(rows))])
-    edited_df = st.data_editor(default_df)
-    return edited_df.to_numpy(dtype=float)
+    # Initialize session state
+    if "rows" not in st.session_state:
+        st.session_state.rows = 3
+    if "cols" not in st.session_state:
+        st.session_state.cols = 4
+
+    # Build table from current sizes
+    default_df = pd.DataFrame(
+        [[0] * st.session_state.cols for _ in range(st.session_state.rows)]
+    )
+
+    edited_df = st.data_editor(default_df, key="matrix_editor")
+
+    # Controls BELOW the table
+    col1, col2 = st.columns(2)
+    with col1:
+        new_rows = st.number_input(
+            "Rows", min_value=1, max_value=10,
+            value=st.session_state.rows, key="rows_input"
+        )
+    with col2:
+        new_cols = st.number_input(
+            "Columns", min_value=1, max_value=10,
+            value=st.session_state.cols, key="cols_input"
+        )
+
+    # If user changes rows/cols → update state and rerun
+    if new_rows != st.session_state.rows or new_cols != st.session_state.cols:
+        st.session_state.rows = new_rows
+        st.session_state.cols = new_cols
+        st.rerun()   # rebuild the table with new shape
+
+    return edited_df.to_numpy(float)
+
 
 def getMatrix(input_type):
-    if input_type == "CSV":
+    if input_type == "GUI":
+        return createMatrix()
+    else:  # CSV
         uploaded = st.file_uploader("Upload augmented matrix as CSV", type="csv")
         if uploaded is None:
             st.info("Please upload a CSV file to continue.")
             return None
         df = pd.read_csv(uploaded, header=None)
         return df.to_numpy(dtype=float)
-    else:  # GUI
-        return createMatrix()
-    
+
     
 def selectMember():
     return st.selectbox("Select whose method to use:", ["Daniel", "Francis", "Jhon", "Mark"])
