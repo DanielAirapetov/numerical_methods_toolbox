@@ -27,16 +27,28 @@ def createMatrix():
     edited_df = st.data_editor(default_df)
     return edited_df.to_numpy(dtype=float)
 
+def getMatrix(input_type):
+    if input_type == "CSV":
+        uploaded = st.file_uploader("Upload augmented matrix as CSV", type="csv")
+        if uploaded is None:
+            st.info("Please upload a CSV file to continue.")
+            return None
+        df = pd.read_csv(uploaded, header=None)
+        return df.to_numpy(dtype=float)
+    else:  # GUI
+        return createMatrix()
+    
+    
 def selectMember():
     return st.selectbox("Select whose method to use:", ["Daniel", "Francis", "Jhon", "Mark"])
 
 st.title("Systems of Equations Methods Calculator")
-
 method_type = st.selectbox("Choose a method type:", ["Direct", "Iterative"])
 
 if method_type == "Direct":
     method = st.selectbox("Choose a method:", ["Gaussian", "Gauss-Jordan"])
-    matrix = createMatrix()
+    input_type = st.selectbox("Choose a input type: ", ["CSV", "GUI"])
+    matrix = getMatrix(input_type)
     member = selectMember()
 
     if st.button("Solve Direct"):
@@ -61,7 +73,8 @@ if method_type == "Direct":
 
 else:  # Iterative
     method = st.selectbox("Choose a method:", ["Gauss-Seidel", "Jacobi"])
-    matrix = createMatrix()
+    input_type = st.selectbox("Choose an input type: ", ["CSV", "GUI"])
+    matrix = getMatrix(input_type)
     member = selectMember()
 
     if st.button("Solve Iterative"):
