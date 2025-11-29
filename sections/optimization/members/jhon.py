@@ -1,39 +1,34 @@
+import numpy as np
 import sympy as sp
+import math
+        
+def newtonMinMaxMethod(x0, tolerance, sym_func):
 
-def function(data_point, n = 0):
-    equation = pow(data_point, 3) - 4 * data_point
+    x = sp.Symbol('x')
+    function_diff1 = sp.diff(sym_func, x)
+    function_diff2 = sp.diff(function_diff1, x)
+
+    function = sp.lambdify(x, sym_func, modules = ["math"])
+    f_d1 = sp.lambdify(x, function_diff1, modules = ["math"])
+    f_d2 = sp.lambdify(x, function_diff2, modules = ["math"])
     
-    if n == 0:
-        return equation
-    else:
-        x = sp.Symbols('x')
-        equation = pow(x, 3) - 4 * x
-        
-        if n == 1:
-            first_derivative = sp.diff(equation, x, 1)
-            return first_derivative.subs(x, data_point)
-        elif n == 2: 
-            second_derivative = sp.diff(equation, x, 2)
-            return second_derivative.subs(x, data_point)
-        
-def newtonMinMax(x0, tolerance):
+
     a = 1
     i = 1
      
-    x_k = x0
-    x_k_1 = x_k - a * (function(x_k, 1) / function(x_k, 2))
+    x1 = x0 - a * (f_d1(x0) / f_d2(x0))
     
-    while abs(x_k_1 - x_k) > tolerance and i <= 100:
-        x_k = x_k_1
-        x_k_1 = x_k - a * (function(x_k, 1) / function(x_k, 2))
+    while np.abs(x1 - x0) > tolerance and i <= 1000:
+        x0 = x1
+        x1 = x0 - a * (f_d1(x0) / f_d2(x0))
         i += 1
         
-    return x_k_1, i
+    return x1, i
     
 def goldenSectionMethod(a, b, tolerance, flag, sym_func):
 
     x = sp.Symbol('x')
-    function = sp.lambdify(x, sym_func, "numpy")
+    function = sp.lambdify(x, sym_func, modules = ["math"])
 
     golden_section = 1.618
     
