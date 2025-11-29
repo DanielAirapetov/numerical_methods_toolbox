@@ -14,8 +14,9 @@ def jacobi_method (mat, tolerance, stopping_criterion):
         new_x[i] = 1
     
     error = 10
-    
+    iterations = 0
     while (error > tolerance):
+        iterations += 1
         error = 0
         
         for i in range(n): 
@@ -37,5 +38,5 @@ def jacobi_method (mat, tolerance, stopping_criterion):
         elif (stopping_criterion == 4):
             error = np.sqrt(np.mean((A0 @ new_x - b0) ** 2))
     
-    return new_x
+    return new_x, iterations
 

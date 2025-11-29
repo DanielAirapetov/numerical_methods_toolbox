@@ -15,8 +15,9 @@ def gauss_seidel (mat, tolerance, stopping_criterion):
         old_x[i] = x[i]
     
     error = 10
-    
+    iterations = 0
     while (error > tolerance):
+        iterations += 1
         error = 0
         
         for i in range(n): 
@@ -38,4 +39,4 @@ def gauss_seidel (mat, tolerance, stopping_criterion):
         
         old_x = x.copy()
     
-    return x
+    return x, iterations

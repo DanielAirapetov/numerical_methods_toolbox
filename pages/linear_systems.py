@@ -11,8 +11,8 @@ if ROOT not in sys.path:
 
 from sections.linear_systems.direct_elimination.gaussian import frankieG, markG, danielG
 from sections.linear_systems.direct_elimination.gauss_jordan import frankieGJ, markGJ, danielGJ
-from sections.linear_systems.iterative.seidel import frankieGS, danielGS
-from sections.linear_systems.iterative.jacobi import frankieJ, danielJ
+from sections.linear_systems.iterative.seidel import frankieGS, danielGS, markGS, jhonGS
+from sections.linear_systems.iterative.jacobi import frankieJ, danielJ, markJ, jhonJ
 
 
 def printResults(results, method, member):
@@ -109,8 +109,8 @@ if method_type == "Direct":
                     results = danielGJ.gauss_jordan_elimination(list)
 
             else:
-                st.error("Jhon's methods not implemented yet.")
-
+                st.error("Still dont have jhons direct elim functions")
+                    
             if results is not None:
                 printResults(results, method, member)
 
@@ -144,9 +144,17 @@ else:  # Iterative
                 else:  # Jacobi
                     results, iters = danielJ.jacobi_iterative_method(list, tolerance, flag)
 
-            else:
-                st.error("Mark and Jhon's iterative methods not implemented yet.")
-
+            elif member == "Mark":
+                if method == "Gauss-Seidel":
+                    results, iters = markGS.gaussSeidelMethod(matrix, tolerance, flag)
+                else:
+                    results, iters = markJ.gaussSeidelMethod(matrix, tolerance, flag)
+            else: #Jhon
+                if method == "Gauss-Seidel":
+                    results, iters = jhonGS.gauss_seidel(matrix,tolerance,flag)
+                else:
+                    results, iters = jhonJ.jacobi_method(matrix,tolerance,flag)
+    
             if results is not None:
                 printResults(results, method, member)
                 if iters is not None:

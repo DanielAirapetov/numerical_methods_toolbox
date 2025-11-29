@@ -55,7 +55,7 @@ def gaussSeidelMethod(A, delta, flag):
     iterations = 0
     max_iter = 1000
 
-    error = float('inf')
+    error = float('inf') 
 
     prev_x = np.zeros(m)
     x = np.random.rand(m)

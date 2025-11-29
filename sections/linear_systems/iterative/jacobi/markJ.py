@@ -9,7 +9,7 @@ def isDiagonallyDominant(A):
 
 
     for i in range(m):
-
+ 
         pivot = abs(A[i][i])
 
         for j in range(m):
