@@ -12,18 +12,23 @@ def lagrange_function(z, x, f):
     
     return interpolated_value
     
-def numerical_differentation(x, f, h, method, type_of_interpolation): 
+def numerical_differentation(data_point, x, f, h, method, type_of_interpolation): 
     data_points_used = None
     values_used = None
     
-    data_point = float(input("\nWhat is the data point you want to find the derivative value of: "))
+    nums_data_points = None
     
-    if(type_of_interpolation == 1):
-        data_points_used = x[0:3]
-        values_used = f[0:3]
+    if type_of_interpolation == 1:
+        nums_data_points = 3
     else:
-        data_points_used = x[0:]
-        values_used = f[0:]
+        nums_data_points = 4
+        
+    distances = np.abs(x - data_point)
+    sorted_indices = np.argsort(distances)
+    selected_indices = sorted_indices[:nums_data_points]
+    
+    data_points_used = x[selected_indices]
+    values_used = f[selected_indices]
         
     data_point_value = None
     
