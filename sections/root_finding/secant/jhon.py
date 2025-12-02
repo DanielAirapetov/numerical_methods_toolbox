@@ -20,8 +20,8 @@ def secant_method(x0, x1, tolerance, flag, user_function):
         else:
             if flag == 1:
                 if abs(x0 - x1) < tolerance:
-                    estimatedRoot = x1
-                    estimatedRootFound = True
+                    estimated_root = x1
+                    estimated_root_found = True
             elif flag == 2:
                 if (abs(x0 - x1) / abs(x1)) < tolerance:
                     estimated_root = x1
@@ -36,3 +36,4 @@ def secant_method(x0, x1, tolerance, flag, user_function):
                     estimated_root_found = True
     
     return estimated_root, i
+
