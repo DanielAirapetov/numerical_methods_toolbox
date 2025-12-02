@@ -7,44 +7,37 @@ def goldenSectionMethod(a, b, tol, flag, sym_func):
     x = sp.Symbol("x")
     func = sp.lambdify(x, sym_func, "numpy")
 
-    GOLDEN_SECTION = (1 + 5**0.5) / 2
-    x1 = b - (b-a) / GOLDEN_SECTION
-    x2 = a + (b-a) / GOLDEN_SECTION
-    y1 = func(x1)
-    y2 = func(x2)
-    iter = 0
-    while abs(b-a) > tol:
-        if iter > 1000:
-            print("Iterations have exceeded 1000, terminating function.")
-            break
+    GOLDEN_SECTION = (1 + np.sqrt(5)) / 2
+
+    x1 = b - ((b-a) / GOLDEN_SECTION)
+    x2 = a + ((b-a) / GOLDEN_SECTION)
+
+    error = float('inf')
+    iterations = 0
+
+    while error > tol and iterations < 1000:
         if flag == 1:
-                if y1 >= y2:
-                    a = x1
-                    x1 = x2
-                    x2 = a + (b-a) / GOLDEN_SECTION
-                    y1 = y2
-                    y2 = func(x2)
-                else:
-                    b = x2
-                    x2 = x1
-                    x1 = b - (b-a) / GOLDEN_SECTION
-                    y2 = y1
-                    y1 = func(x1)
+            if func(x1) >= func(x2):
+                a = x1
+                x1 = x2
+                x2 = a + ((b-a) / GOLDEN_SECTION)
+            else:
+                b = x2
+                x2 = x1
+                x1 = b - ((b-a) / GOLDEN_SECTION)
         elif flag == 2:
-                if y1 <= y2:
-                    a = x1
-                    x1 = x2
-                    x2 = a + (b-a) / GOLDEN_SECTION
-                    y1 = y2
-                    y2 = func(x2)
-                else:
-                    b = x2
-                    x2 = x1
-                    x1 = b - (b-a) / GOLDEN_SECTION
-                    y2 = y1
-                    y1 = func(x1)
-        iter+=1
-    return (a+b)/2, iter
+            if func(x1) < func(x2):
+                a = x1
+                x1 = x2
+                x2 = a + ((b-a) / GOLDEN_SECTION)
+            else:
+                b = x2
+                x2 = x1
+                x1 = b - ((b-a) / GOLDEN_SECTION)
+
+        error = np.abs(a - b)
+        iterations+=1
+    return ((a+b)/2), iterations
 
 
 def newtonMinMaxMethod(x_prev, tol, sym_func):
@@ -74,11 +67,8 @@ def newtonMinMaxMethod(x_prev, tol, sym_func):
     func_I = sp.lambdify(x, sym_func_I)
     func_II = sp.lambdify(x, sym_func_II)
 
-    iter = 0
+    iterations = 0
     while True:
-        if iter > 1000:
-            print("Iterations have exceeded 1000, terminating function.")
-            break
         if abs(func_II(x_prev)) < 10**-10:
             print("Second derivative is 0, terminating function")
             break
@@ -87,6 +77,5 @@ def newtonMinMaxMethod(x_prev, tol, sym_func):
         if abs(x_next - x_prev) <= tol:
             break
         x_prev = x_next
-        iter+=1
-    return x_prev, func(x_prev), iter
-
+        iterations+=1
+    return x_prev, iterations
