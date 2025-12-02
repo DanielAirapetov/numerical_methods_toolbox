@@ -30,6 +30,18 @@ def safe_eval(func: str, x):
     }
     return eval(func, {"__builtins__": {}}, allowed)
 
+def float_input(label, default):
+    text = st.text_input(label, value=str(default))
+    try:
+        return float(text)
+    except ValueError:
+        return None
+
+
+
+
+
+
 
 # center the layout
 # add blank space on left and right
@@ -45,18 +57,19 @@ with center_right:
     function_text = st.text_input("f(x) =", value="")
     
 
-    method_col, member_col = st.columns([1, 1])
+    method_col, member_col, delta_col = st.columns([0.9, 0.9, 1])
     with method_col:
         method = st.selectbox(
-            "Choose a Method",
+            "Choose a method",
             options = ["Golden Section", "Newton Min/Max"]
             )
     with member_col:
         member = st.selectbox(
-                "Whose method would you like to use?",
+                "Choose a member",
                 options = ["Daniel", "Jhon", "Mark", "Francis"]
                 )
-
+    with delta_col:
+        delta = float_input("Error threshold", "")
 
     if method == "Golden Section":
 
@@ -64,9 +77,11 @@ with center_right:
 
         input_box1, input_box2 = st.columns(2)
         with input_box1:
-            left_bound = float(st.number_input("a: ", value=0))
+            #left_bound = st.number_input("a: ", value=0.0, format="%f")
+            left_bound = float_input("a: ", "")
         with input_box2:
-            right_bound = float(st.number_input("b: ", value=0))
+            #right_bound = st.number_input("b: ", value=0.0, format="%f")
+            right_bound = float_input("b: ", "")
 
         min_max = st.segmented_control(
                 "",
@@ -75,7 +90,7 @@ with center_right:
         )
 
     else:
-        left_bound = st.text_input("Initial Guess", value="")
+        left_bound = st.number_input("Initial Guess", value=0, format="%f")
 
 
     compute_button, computed_result = st.columns([1, 1])
@@ -107,32 +122,15 @@ with center_right:
 
     with compute_button:
 
-        if st.button("Compute"):
+        if st.button("Compute") and function_text.strip != "" and delta != None and left_bound != None and right_bound != None:
 
             if method == "Golden Section":
 
-                if left_bound == 0 or right_bound == 0:
-
-                    st.error("Please enter left and right bounds")
-
-                else:
-                    try:
-
-                        left_val = float(left_bound)
-                        right_val = float(right_bound)
-
-                    except ValueError:
-
-                        st.error("Bounds must be valid numbers")
-                        left_bound = 0
-                        right_bound = 0
-
-                if left_bound != 0 and right_bound != 0:
-
-                    st.session_state["compute_goldenSection"] = True
+                st.session_state["compute_goldenSection"] = True
             else:
 
                 st.session_state["compute_newtonMinMax"] = True
+
 
     with computed_result:
 
@@ -143,18 +141,19 @@ with center_right:
 
         if st.session_state.get("compute_goldenSection", False):
             if member == "Daniel":
-                result, iterations = daniel.goldenSectionMethod(left_val, right_val, 1e-6, 1, function_symbolic)
+                result, iterations = daniel.goldenSectionMethod(left_bound, right_bound, 0.000001, flag, function_symbolic)
             elif member == "Jhon":
-                result, iterations = jhon.goldenSectionMethod(left_val, right_val, 0.000001, flag, function_symbolic)
+                result, iterations = jhon.goldenSectionMethod(left_bound, right_bound, 0.000001, flag, function_symbolic)
             elif member == "Mark":
-                result, iterations = mark.goldenSectionMethod(left_val, right_val, 0.000001, flag, function_symbolic)
-            else:
-                result, iterations = francis.goldenSectionMethod(left_val, right_val, 0.000001, flag, function_symbolic)
+                result, iterations = mark.goldenSectionMethod(left_bound, right_bound, 0.000001, flag, function_symbolic)
+            elif member == "Francis":
+                result, iterations = francis.goldenSectionMethod(left_bound, right_bound, 0.000001, flag, function_symbolic)
 
             st.write(f"**{min_max} at:** {result}")
             st.write(f"**Iterations:** {iterations}")
 
-# plot section with slider to change bounds
+
+# plot with interval bound inputs to increase or decrease the viewing window of the plotted function
 with center_left:
 
     # plot
