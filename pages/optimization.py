@@ -3,16 +3,14 @@ import numpy as np
 import pandas as pd
 import altair as alt
 
-from numerical_methods_toolbox/sections/
+
 
 st.set_page_config(layout="wide")
 
-# ---- Title ----
-st.markdown("<h1 style='text-align: center;'>Golden Section Method</h1>", 
-            unsafe_allow_html=True)
+# title
+st.markdown("<h1 style='text-align:center; margin-bottom:10px; margin-top:-30px'>Optimization Methods</h1>",unsafe_allow_html=True)
 
-
-# ---- Safe evaluation ----
+# safe evaluation
 def safe_eval(func: str, x):
     allowed = {
         "x": x,
@@ -25,68 +23,109 @@ def safe_eval(func: str, x):
     return eval(func, {"__builtins__": {}}, allowed)
 
 
-# ---- Centered layout: empty - plot - inputs - empty ----
-left_spacer, left_col, right_col, right_spacer = st.columns([1, 4, 4, 1])
+# center the layout
+# add blank space on left and right
+# center the plots and input
+left, center_left, center_right, right = st.columns([1, 4, 4, 1])
 
 
-# RIGHT: Function input
-with right_col:
-    st.write("## Enter a function f(x):")
-    func_text = st.text_input("f(x) =", value="x**2 + 3*x + 2")
+# right side of page
+# inputs and selections
+with center_right:
 
-    st.write("## Bounds")
-    col_a, col_b = st.columns(2)
+    st.write("## Enter a Function")
+    function_text = st.text_input("f(x) =", value="")
 
-    with col_a:
-        param1 = st.text_input("Left Bound: ", value="")
-
-    with col_b:
-        param2 = st.text_input("Right Bound: ", value="")
+    method = st.selectbox(
+            "Choose a Method",
+            options = ["Golden Section", "Newton Min/Max"]
+            )
 
 
+    if method == "Golden Section":
+        st.markdown("<p style='margin-bottom:-10px;'>Choose bounds that bracket a min/max</p>", unsafe_allow_html=True)
+        input_box1, input_box2 = st.columns(2)
+        with input_box1:
+            left_bound = st.text_input("a: ", value="")
+        with input_box2:
+            right_bound = st.text_input("b: ", value="")
 
-# LEFT: Plot + slider
-with left_col:
+        min_max = st.segmented_control(
+                "",
+                options = ["Minimum", "Maximum"],
+                default = "Minimum"
+                )
+        
 
-    # --- create placeholder for the plot ---
+    elif method == "Newton Min/Max":
+        left_bound = st.text_input("Initial Guess", value="")
+
+# plot section with slider to change bounds
+with center_left:
+
+    # --- Plot first ---
+    x_points = np.linspace(-10, 10, 500)   # temporary defaults (will be overwritten)
+    y_points = np.full_like(x_points, np.nan)
+
+    # Empty initial DataFrame
+    df = pd.DataFrame({"x": x_points, "f(x)": y_points})
+
     plot_placeholder = st.empty()
 
-    # --- compute a,b FIRST, but slider appears below ---
-    slider_left, slider_center, slider_right = st.columns([1, 5, 1.25])
-    with slider_center:
-        a, b = st.slider(
-            "Interval [a, b]:",
-            min_value=-1000.0,
-            max_value=1000.0,
-            value=(-5.0, 5.0),
-            step=0.1
+    left_interval, right_interval = st.columns([1, 1])
+
+
+    with left_interval:
+        a = st.number_input(
+            "Left Bound",
+            value=-10.0,
+            step=0.1,
+            key="left_bound"
         )
 
-    # --- now draw the plot ABOVE using updated a,b ---
-    with plot_placeholder:
-        if func_text.strip() != "":
-            try:
-                xs = np.linspace(a, b, 300)
-                ys = safe_eval(func_text, xs)
+    with right_interval:
+        b = st.number_input(
+            "Right Bound",
+            value=10.0,
+            step=0.1,
+            key="right_bound"
+        )
 
-                df = pd.DataFrame({"x": xs, "f(x)": ys})
+    # Recompute plot with user bounds
+    x_points = np.linspace(a, b, 500)
+    y_points = np.full_like(x_points, np.nan)
 
-                chart = (
-                    alt.Chart(df)
-                    .mark_line()
-                    .encode(x="x", y="f(x)")
-                    .properties(width=600, height=600)
+    if function_text.strip() != "":
+        try:
+            y_points = safe_eval(function_text, x_points)
+        except Exception as e:
+            plot_placeholder.error(f"Error evaluating function: {e}")
+
+    df = pd.DataFrame({"x": x_points, "f(x)": y_points})
+
+    chart = (
+        alt.Chart(df)
+        .mark_line()
+        .encode(
+            x=alt.X("x", title="x", scale=alt.Scale(domain=[a, b])),
+            y=alt.Y(
+                "f(x)",
+                title="f(x)",
+                scale=alt.Scale(
+                    domain=[np.nanmin(y_points), np.nanmax(y_points)]
+                    if not np.isnan(y_points).all()
+                    else [-10, 10]
                 )
+            )
+        )
+        .properties(width=600, height=600)
+    )
 
-                st.altair_chart(chart, use_container_width=False)
-
-            except Exception as e:
-                st.error(f"Error evaluating function: {e}")
-        else:
-            st.info("Enter a valid function.")
-
-
-
+    # Render chart INTO the placeholder ABOVE the input boxes
+    plot_placeholder.altair_chart(chart, use_container_width=False)
+     
+        
+        
 
 
 # ---- Golden Section Method ----
