@@ -28,7 +28,7 @@ def bisection(x1, x2, tolerance, flag, user_function):
             if flag == 1:
                 if abs(x3 - x4) < tolerance:
                     estimated_root = x3
-                    estimated_root_found + True
+                    estimated_root_found = True
             elif flag == 2:
                 if (abs(x3 - x4) / abs(x3)) < tolerance:
                     estimated_root = x3
@@ -43,3 +43,4 @@ def bisection(x1, x2, tolerance, flag, user_function):
                     estimated_root_found = True
     
     return estimated_root, i
+
