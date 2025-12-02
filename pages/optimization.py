@@ -64,9 +64,9 @@ with center_right:
 
         input_box1, input_box2 = st.columns(2)
         with input_box1:
-            left_bound = st.number_input("a: ", value="")
+            left_bound = float(st.number_input("a: ", value=0))
         with input_box2:
-            right_bound = st.number_input("b: ", value="")
+            right_bound = float(st.number_input("b: ", value=0))
 
         min_max = st.segmented_control(
                 "",
@@ -111,7 +111,7 @@ with center_right:
 
             if method == "Golden Section":
 
-                if left_bound.strip() == "" or right_bound.strip() == "":
+                if left_bound == 0 or right_bound == 0:
 
                     st.error("Please enter left and right bounds")
 
@@ -124,10 +124,10 @@ with center_right:
                     except ValueError:
 
                         st.error("Bounds must be valid numbers")
-                        left_val = None
-                        right_val = None
+                        left_bound = 0
+                        right_bound = 0
 
-                if left_val is not None and right_val is not None:
+                if left_bound != 0 and right_bound != 0:
 
                     st.session_state["compute_goldenSection"] = True
             else:
