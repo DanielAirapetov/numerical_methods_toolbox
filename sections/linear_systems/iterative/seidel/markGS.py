@@ -59,7 +59,6 @@ def gaussSeidelMethod(A, delta, flag):
 
     prev_x = np.zeros(m)
     x = np.random.rand(m)
-    swap = np.zeros(m)
 
     completePivoting(A)
 
@@ -108,3 +107,4 @@ def gaussSeidelMethod(A, delta, flag):
     
 
     return x, iterations
+
