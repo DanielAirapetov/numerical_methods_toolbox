@@ -1,6 +1,6 @@
 import numpy as np
 import sympy as sp
-
+import math
         
 def newtonMinMaxMethod(x0, tolerance, sym_func):
 
@@ -8,9 +8,9 @@ def newtonMinMaxMethod(x0, tolerance, sym_func):
     function_diff1 = sp.diff(sym_func, x)
     function_diff2 = sp.diff(function_diff1, x)
 
-    function = sp.lambdify(x, sym_func, "numpy")
-    f_d1 = sp.lambdify(x, function_diff1, "numpy")
-    f_d2 = sp.lambdify(x, function_diff2, "numpy")
+    function = sp.lambdify(x, sym_func, modules = ["math"])
+    f_d1 = sp.lambdify(x, function_diff1, modules = ["math"])
+    f_d2 = sp.lambdify(x, function_diff2, modules = ["math"])
     
 
     a = 1
@@ -28,7 +28,7 @@ def newtonMinMaxMethod(x0, tolerance, sym_func):
 def goldenSectionMethod(a, b, tolerance, flag, sym_func):
 
     x = sp.Symbol('x')
-    function = sp.lambdify(x, sym_func, "numpy")
+    function = sp.lambdify(x, sym_func, modules = ["math"])
 
     golden_section = 1.618
     
