@@ -1,10 +1,11 @@
 import numpy as np
 import sympy as sp
+import math
 
 def goldenSectionMethod(a,b, tol, flag, f): # golden section function for nonlinear optimization
 
     x = sp.Symbol("x")
-    func = sp.lambdify(x, f, "numpy")
+    func = sp.lambdify(x, f, modules = ["math"])
 
 
     phi = (1 + np.sqrt(5))/2 # assign phi (golden ratio number)
@@ -44,8 +45,8 @@ def newtonMinMaxMethod(x0, tol, f): #Newtons method for nonlinear optimization
     x = sp.symbols('x') # define x as a symbol used in symbolic differentiation
     fDiffSym= sp.diff(f,x) # define first derivative using sympys diff functin
     f2DiffSym = sp.diff(fDiffSym,x) # get second derivative by using diff again on the first derviative
-    f1_diff = sp.lambdify(x, fDiffSym, 'numpy') #use sympys lambdify function to convert the symbolic string into a lambda function like the one used in GS method which makes calculations possible
-    f2_diff= sp.lambdify(x, f2DiffSym, 'numpy')
+    f1_diff = sp.lambdify(x, fDiffSym, modules = ["math"]) #use sympys lambdify function to convert the symbolic string into a lambda function like the one used in GS method which makes calculations possible
+    f2_diff= sp.lambdify(x, f2DiffSym, modules = ["math"])
     error = float('inf') # initalize large error so loop condition is met
     i = 0 # initialize iteration counter
     xprev = x0
