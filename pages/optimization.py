@@ -12,6 +12,16 @@ if ROOT not in sys.path:
 
 from sections.optimization.members import daniel, jhon, mark, francis
 
+if "compute_goldenSection" not in st.session_state:
+    st.session_state["compute_goldenSection"] = False
+if "compute_newtonMinMax" not in st.session_state:
+    st.session_state["compute_newtonMinMax"] = False
+if "inputs" not in st.session_state:
+    st.session_state["inputs"] = None
+if "outputs" not in st.session_state:
+    st.session_state["outputs"] = None
+
+
 # set page layout to wide
 st.set_page_config(layout="wide")
 
@@ -88,9 +98,13 @@ with center_right:
                 options = ["Minimum", "Maximum"],
                 default = "Minimum"
         )
+        if min_max == 1:
+            flag = 1
+        else:
+            flag = 2
 
     else:
-        left_bound = st.number_input("Initial Guess", value=0, format="%f")
+        left_bound = float_input("Initial Guess: ", "")
 
 
     compute_button, computed_result = st.columns([1, 1])
@@ -122,36 +136,73 @@ with center_right:
 
     with compute_button:
 
-        if st.button("Compute") and function_text.strip != "" and delta != None and left_bound != None and right_bound != None:
+        if st.button("Compute"):
+            if function_text.strip() != "" and delta != None:
+                if method == "Golden Section" and left_bound != None and right_bound != None:
+                    st.session_state["compute_goldenSection"] = True
+                    st.session_state["compute_newtonMinMax"] = False
+                    
+                    st.session_state["inputs"] = {
+                            "a": left_bound,
+                            "b": right_bound,
+                            "delta": delta,
+                            "flag": flag,
+                            "method": "golden",
+                            "member": member,
+                            "func": function_symbolic
+                            }
+                elif method == "Newton Min/Max" and left_bound != None:
+                    st.session_state["compute_goldenSection"] = False
+                    st.session_state["compute_newtonMinMax"] = True
 
-            if method == "Golden Section":
+                    st.session_state["inputs"] = {
+                            "a": left_bound,
+                            "delta": delta,
+                            "method": "newton",
+                            "member": member,
+                            "func": function_symbolic
+                            }
 
-                st.session_state["compute_goldenSection"] = True
-            else:
-
-                st.session_state["compute_newtonMinMax"] = True
 
 
     with computed_result:
 
-        if min_max == "Minimum":
-            flag = 1
-        else:
-            flag = 2
-
         if st.session_state.get("compute_goldenSection", False):
+
+            inputs = st.session_state["inputs"]
+            st.session_state["compute_goldenSection"] = False
+
             if member == "Daniel":
-                result, iterations = daniel.goldenSectionMethod(left_bound, right_bound, delta, flag, function_symbolic)
+                result, iterations = daniel.goldenSectionMethod(inputs["a"], inputs["b"], inputs["delta"], inputs["flag"], inputs["func"])
             elif member == "Jhon":
-                result, iterations = jhon.goldenSectionMethod(left_bound, right_bound, delta, flag, function_symbolic)
+                result, iterations = jhon.goldenSectionMethod(inputs["a"], inputs["b"], inputs["delta"], inputs["flag"], inputs["func"])
             elif member == "Mark":
-                result, iterations = mark.goldenSectionMethod(left_bound, right_bound, delta, flag, function_symbolic)
+                result, iterations = mark.goldenSectionMethod(inputs["a"], inputs["b"], inputs["delta"], inputs["flag"], inputs["func"])
             elif member == "Francis":
-                result, iterations = francis.goldenSectionMethod(left_bound, right_bound, delta, flag, function_symbolic)
+                result, iterations = francis.goldenSectionMethod(inputs["a"], inputs["b"], inputs["delta"], inputs["flag"], inputs["func"])
 
-            st.write(f"**{min_max} at:** {result}")
+            st.session_state["outputs"] = (result, iterations)
+
+        elif st.session_state.get("compute_newtonMinMax", False):
+
+            inputs = st.session_state["inputs"]
+            st.session_state["compute_newtonMinMax"] = False
+
+            if member == "Daniel":
+                result, iterations = daniel.newtonMinMaxMethod(inputs["a"], inputs["delta"], inputs["func"])
+            elif member == "Jhon":
+                result, iterations = jhon.newtonMinMaxMethod(inputs["a"], inputs["delta"], inputs["func"])
+            elif member == "Mark":
+                result, iterations = mark.newtonMinMaxMethod(inputs["a"], inputs["delta"], inputs["func"])
+            elif member == "Francis":
+                result, iterations = francis.newtonMinMaxMethod(inputs["a"], inputs["delta"], inputs["func"])
+
+            st.session_state["outputs"] = (result, iterations)
+
+        if st.session_state.get("outputs", False) != None:
+            result, iterations = st.session_state["outputs"]
+            st.write(f"**Result:** {result}")
             st.write(f"**Iterations:** {iterations}")
-
 
 # plot with interval bound inputs to increase or decrease the viewing window of the plotted function
 with center_left:
@@ -171,7 +222,7 @@ with center_left:
     with left_interval:
         a = st.number_input(
             "Left Bound",
-            value=-10.0,
+            value=-5.0,
             step=0.1,
             key="left_bound"
         )
@@ -179,7 +230,7 @@ with center_left:
     with right_interval:
         b = st.number_input(
             "Right Bound",
-            value=10.0,
+            value=5.0,
             step=0.1,
             key="right_bound"
         )
