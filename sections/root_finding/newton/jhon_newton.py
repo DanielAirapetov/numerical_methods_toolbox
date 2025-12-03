@@ -38,5 +38,7 @@ def newton_method(x0, tolerance, flag, user_function):
                         estimated_root_found = True
                     else:
                         x0 = x1
+            i += 1; 
     
     return estimated_root, i
+
