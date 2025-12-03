@@ -33,8 +33,9 @@ def jacobi_method (mat, tolerance, stopping_criterion):
         elif(stopping_criterion == 2):
             error = math.sqrt(np.mean((new_x - old_x) ** 2))
         elif (stopping_criterion == 3):
-            error = np.max(np.abs(A0 @ new_x - b0))
+            error = np.mean(np.abs(A0 @ new_x - b0))
         elif (stopping_criterion == 4):
             error = np.sqrt(np.mean((A0 @ new_x - b0) ** 2))
     
     return new_x
+
