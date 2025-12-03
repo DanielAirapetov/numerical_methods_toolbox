@@ -12,9 +12,7 @@ def secantMethod(x0, x1, delta, flag, f):
 
     
     if np.abs(f(x0)) < np.abs(f(x1)):
-        x0 = x0 ^ x1
-        x1 = x0 ^ x1
-        x0 = x0 ^ x1
+        x0, x1 = x1, x0
 
 
     while error >= delta and iter < 1000:
@@ -43,3 +41,4 @@ def secantMethod(x0, x1, delta, flag, f):
        
 
     return x2, iter
+
