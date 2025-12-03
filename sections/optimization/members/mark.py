@@ -1,12 +1,13 @@
 import numpy as np
 import sympy as sp
+import math
 
 
 
 def goldenSectionMethod(a, b, delta, flag, sym_func):
 
     x = sp.Symbol('x')
-    f = sp.lambdify(x, sym_func, "numpy")
+    f = sp.lambdify(x, sym_func, modules=["math"])
 
     phi = (1 + np.sqrt(5)) / 2
     error = float('inf')
@@ -55,9 +56,9 @@ def newtonMinMaxMethod(x0, delta, sym_func):
     sym_f_first = sp.diff(sym_func, x)
     sym_f_second = sp.diff(sym_f_first, x)
 
-    f = sp.lambdify(x, sym_func, "numpy")
-    f_first = sp.lambdify(x, sym_f_first, "numpy")
-    f_second = sp.lambdify(x, sym_f_second, "numpy")
+    f = sp.lambdify(x, sym_func, modules = ["math"])
+    f_first = sp.lambdify(x, sym_f_first, modules = ["math"])
+    f_second = sp.lambdify(x, sym_f_second, modules = ["math"])
 
 
     alpha = 1
