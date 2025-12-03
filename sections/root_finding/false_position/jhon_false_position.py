@@ -1,5 +1,5 @@
 def false_position_method(x0, x1, tolerance, flag, user_function):
-    while (user_function(x0) * user_function(x1)) < 0:
+    while (user_function(x0) * user_function(x1)) > 0:
         x0 = float(input("Incorrect x0. Please enter another one: "))
         x1 = float(input("Incorrect x1. Please enter another one: "))
     
@@ -27,8 +27,8 @@ def false_position_method(x0, x1, tolerance, flag, user_function):
                 
             if flag == 1:
                 if abs(x - x2) < tolerance:
-                    estimatedRoot = x2
-                    estimatedRootFound = True
+                    estimated_root = x2
+                    estimated_root_found = True
                 else:
                     x = x2
             elif flag == 2:
@@ -38,17 +38,16 @@ def false_position_method(x0, x1, tolerance, flag, user_function):
                 else:
                     x = x2
             elif flag == 3:
-                if user_function(x2) < tolerance:
+                if abs(user_function(x2)) < tolerance:
                     estimated_root = x2
                     estimated_root_found = True
                 else:
                     x = x2
             else:
-                if (abs(x - x2) < tolerance) and (user_function(x2) < tolerance):
+                if (abs(x - x2) < tolerance) and (abs(user_function(x2)) < tolerance):
                     estimated_root = x2
                     estimated_root_found = True
                 else:
                     x = x2
     
     return estimated_root, i
-
