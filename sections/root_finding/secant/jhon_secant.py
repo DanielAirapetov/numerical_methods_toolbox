@@ -27,13 +27,12 @@ def secant_method(x0, x1, tolerance, flag, user_function):
                     estimated_root = x1
                     estimated_root_found = True
             elif flag == 3:
-                if user_function(x1) < tolerance:
+                if abs(user_function(x1)) < tolerance:
                     estimated_root = x1
                     estimated_root_found = True
             else:
-                if (abs(x0 - x1) < tolerance) and (user_function(x1) < tolerance):
+                if (abs(x0 - x1) < tolerance) and (abs(user_function(x1)) < tolerance):
                     estimated_root = x1
                     estimated_root_found = True
     
     return estimated_root, i
-
