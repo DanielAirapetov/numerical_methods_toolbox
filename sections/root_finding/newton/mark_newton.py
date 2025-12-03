@@ -1,6 +1,7 @@
 import numpy as np
 import sympy as sp
 
+x = sp.symbols('x')
 
 def newtonMethod(x0, delta, flag, f):
 
@@ -12,9 +13,7 @@ def newtonMethod(x0, delta, flag, f):
     iter = 0
     max_iter = 1000
 
-
     while error >= delta and iter < max_iter:
-
 
         if f.subs(x, x0) == 0:
             x1 = x0
@@ -23,7 +22,6 @@ def newtonMethod(x0, delta, flag, f):
         iter += 1
 
         while f_prime.subs(x, x0) == 0:
-
             print("x0 is near a local max/min | re-select x0: ")
             x0 = int(input())
 
@@ -46,3 +44,4 @@ def newtonMethod(x0, delta, flag, f):
             x0 = x1
 
     return x1, iter
+
