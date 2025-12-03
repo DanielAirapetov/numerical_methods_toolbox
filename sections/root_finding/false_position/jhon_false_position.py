@@ -51,3 +51,4 @@ def false_position_method(x0, x1, tolerance, flag, user_function):
                     x = x2
     
     return estimated_root, i
+
