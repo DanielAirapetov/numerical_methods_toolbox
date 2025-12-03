@@ -1,10 +1,9 @@
 import numpy as np
 import sympy as sp
 
-x = sp.symbols('x')
-
 def newtonMethod(x0, delta, flag, f):
-
+    x = sp.symbols('x')
+    
     f_prime = sp.diff(f, x)
     x1 = 0
 
@@ -44,4 +43,5 @@ def newtonMethod(x0, delta, flag, f):
             x0 = x1
 
     return x1, iter
+
 
