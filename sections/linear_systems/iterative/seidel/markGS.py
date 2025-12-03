@@ -25,7 +25,7 @@ def isDiagonallyDominant(A):
     return True
 
 
-def completePivoting(A):
+def partialPivoting(A):
 
     m = A.shape[0]
     i = 0
@@ -36,9 +36,8 @@ def completePivoting(A):
         maxi = i
 
         for k in range(i, m):
-
-                if abs(A[k][j]) > abs(A[maxi][j]):
-                    maxi = k
+            if abs(A[k][j]) > abs(A[maxi][j]):
+                maxi = k
 
         if A[maxi][j] != 0:
             A[[i, maxi], :] = A[[maxi, i], :]
@@ -60,7 +59,7 @@ def gaussSeidelMethod(A, delta, flag):
     prev_x = np.zeros(m)
     x = np.random.rand(m)
 
-    completePivoting(A)
+    partialPivoting(A)
 
     while error > delta and iterations < max_iter:
         error = 0
@@ -107,4 +106,5 @@ def gaussSeidelMethod(A, delta, flag):
     
 
     return x, iterations
+
 
