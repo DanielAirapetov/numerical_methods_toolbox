@@ -5,6 +5,10 @@ import altair as alt
 import sympy as sp
 import os, sys
 
+st.set_page_config(
+    page_title ="Optimization",
+    initial_sidebar_state ="collapsed" 
+)
 
 ROOT = os.path.dirname(os.path.dirname(__file__))
 if ROOT not in sys.path:
@@ -280,4 +284,5 @@ with center_left:
 
     # render plot
     plot_placeholder.altair_chart(chart, use_container_width=False)
+
 
