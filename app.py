@@ -3,9 +3,6 @@ from PIL import Image
 import base64
 from io import BytesIO
 
-from pages import root_finding
-from pages import linear_systems
-
 st.set_page_config(
     page_title = "Numerical Methods Toolbox",
     initial_sidebar_state = "collapsed" 
@@ -13,11 +10,6 @@ st.set_page_config(
 
 if "page" not in st.session_state:
     st.session_state.page = "Home"
-
-page_functions = {
-    "Solving Nonlinear Equations": root_finding.main,
-    "Solving Linear Systems": linear_systems.main
-}
 
 def navigate_to(page_name):
     st.session_state.page = page_name
@@ -88,26 +80,29 @@ def home_page():
 
         for i, (col, page) in enumerate(zip(cols, row)):
             with col:
-                # FIXED BUTTON: changed on_click and added args
                 st.button(
                     page,
                     key=f"{page}_{i}",
                     use_container_width=True,
-                    on_click=navigate_to,
-                    args=(page,)
+                    on_click=st.session_state.update,
+                    kwargs={"page": page}
                 )
 
         st.markdown("<br>", unsafe_allow_html=True)
 
 
+
+
+def page_content(name):
+    st.title(name)
+    st.write(f"Content specific to {name}.")
+    st.button("Back to Home", on_click=lambda: st.session_state.update(page="Home"))
+
 def main():
     if st.session_state.page == "Home":
         home_page()
     else:
-        if st.session_state.page in page_functions:
-            page_functions[st.session_state.page]()
-        else:
-            st.write(f"Page '{st.session_state.page}' not found.")
+        page_content(st.session_state.page)
 
 if __name__ == "__main__":
     main()
