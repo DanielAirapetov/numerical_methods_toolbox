@@ -58,11 +58,9 @@ def home_page():
     st.markdown('<h4 class="subtitle">Hello! How can we assist you today? Please select an option below.</h4>', unsafe_allow_html=True)
 
     pages = [
-        ["Solving Nonlinear Equations",
-        "Solving Linear Systems"],
+        ["Solving Nonlinear Equations", "Solving Linear Systems", "Calculus"],
         
-        ["Calculus",
-        "Nonlinear Optimization"]
+        ["Nonlinear Optimization", "Signal Processing", "About"]
     ]
 
     st.markdown("""
@@ -76,7 +74,7 @@ def home_page():
     """, unsafe_allow_html=True)
     
     for row in pages:
-        cols = st.columns(2)
+        cols = st.columns(3)
 
         for i, (col, page) in enumerate(zip(cols, row)):
             with col:
