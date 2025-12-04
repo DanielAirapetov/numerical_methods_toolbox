@@ -23,14 +23,26 @@ from sections.root_finding.secant import jhon_secant
 from sections.root_finding.secant import franky_secant
 from sections.root_finding.secant import daniel_secant
 
-def user_corrected_equation(equation_str):
-    math_functions = ['sin', 'cos', 'tan', 'exp', 'log', 'sqrt', "pow" ]
-    for funcion in math_functions:
-        equation_str = equation_str.replace(funcion, f'np.{funcion}')
-    return equation_str
+from sections.root_finding.newton import mark_newton
+from sections.root_finding.newton import jhon_newton
+from sections.root_finding.newton import daniel_newton
 
-def evaluate_function(corrected_equation_str, x_value):
-    return eval(corrected_equation_str, {"np": np, "x": x_value})
+def function(equation_str, x_value = None):
+    x = sp.Symbol('x')
+    expr = sp.sympify(equation_str)
+    equation = sp.lambdify(x, expr, modules=['numpy'])
+    
+    if x_value is not None:
+        return equation(x_value)
+    
+    return equation
+
+def derivative_function(equation_str, x_value):
+    x = sp.Symbol('x')
+    expr = sp.sympify(equation_str)
+    derivative_expr = sp.diff(expr, x)
+    return derivative_expr.subs(x, x_value)
+    
 
 def main():
     st.markdown(
@@ -57,13 +69,10 @@ def main():
     equation = None
     equation = st.text_input("Enter the equation you want to solve: ")
     
-    corrected_equation = None
-    
     if equation != None and equation != "":
-        corrected_equation= user_corrected_equation(equation)  
         # Plotting the function
         x = np.linspace(-10, 10, 1600)
-        y = evaluate_function(corrected_equation, x)
+        y = function(equation, x)
         fig, ax = plt.subplots(figsize=(20, 20))
 
         # Plot
@@ -95,11 +104,36 @@ def main():
         
         method = st.selectbox("Select a root-finding method:", ["None", "Bisection Method", "False Position Method", "Secant Method", "Newton Method"])
         person = st.selectbox("Person:", ["None", "Mark", "Francis", "Daniel", "Jhon"])
+        
         if method != "None" and person != "None":
             tolerance = st.number_input("Enter the tolerance level:", value = 1 * 10 ** -6, format="%.6f")
             flag = st.selectbox("Select a flag:", [1, 2, 3, 4])      
             if method == "Newton Method":
                 initial_guess = st.number_input("Enter the initial x value:", value=0.0, format="%.4f")
+                
+                user_input_valid = False
+                
+                if derivative_function(equation, initial_guess) != 0:
+                    user_input_valid = True
+                else:
+                    st.error("The derivative at the initial guess cannot be zero. Please enter a valid initial guess.")
+                    
+                x = sp.Symbol('x')
+                expr = sp.sympify(equation)
+                
+                if user_input_valid:
+                    if person == "Mark":
+                        if st.button("Calculate Root"):
+                            root, iterations = mark_newton.newtonMethod(initial_guess, tolerance, flag, expr)
+                            st.write(f"Root: {root}, Iterations: {iterations}")
+                    elif person == "Daniel":
+                        if st.button("Calculate Root"):
+                            root, iterations = daniel_newton.newton(initial_guess, tolerance, flag, expr)
+                            st.write(f"Root: {root}, Iterations: {iterations}")
+                    elif person == "Jhon":
+                        if st.button("Calculate Root"):
+                            root, iterations = jhon_newton.newton_method(initial_guess, tolerance, flag, expr)
+                            st.write(f"Root: {root}, Iterations: {iterations}")
                 
             else:
                 left_bound = st.number_input("Enter the left bound:", value=0.0, format="%.4f")
@@ -108,7 +142,7 @@ def main():
                 user_input_valid = False
                 
                 if method == "Bisection Method" or method == "False Position Method":
-                    if evaluate_function(corrected_equation, left_bound) * evaluate_function(corrected_equation, right_bound) < 0:
+                    if function(equation, left_bound) * function(equation, right_bound) < 0:
                         user_input_valid = True
                     else:
                         st.error("The function must have different signs at the left and right bounds. Please enter valid bounds.")
@@ -116,73 +150,73 @@ def main():
                 if method == "Bisection Method" and user_input_valid:
                     if person == "Mark":
                         if st.button("Calculate Root"):
-                            root, iterations = mark_bisection.bisectionMethod(left_bound, right_bound, tolerance, flag, lambda x: evaluate_function(corrected_equation, x))
+                            root, iterations = mark_bisection.bisectionMethod(left_bound, right_bound, tolerance, flag, lambda x: function(equation, x))
                             st.write(f"Root: {root}, Iterations: {iterations}")
                     elif person == "Jhon":
                         if st.button("Calculate Root"):
-                            root, iterations = jhon_bisection.bisection(left_bound, right_bound, tolerance, flag, lambda x: evaluate_function(corrected_equation, x))
+                            root, iterations = jhon_bisection.bisection(left_bound, right_bound, tolerance, flag, lambda x: function(equation, x))
                             st.write(f"Root: {root}, Iterations: {iterations}")
                     elif person == "Francis":
                         if st.button("Calculate Root"):
-                            root, iterations = franky_bisection.bisection(left_bound, right_bound, tolerance, flag, lambda x: evaluate_function(corrected_equation, x))
+                            root, iterations = franky_bisection.bisection(left_bound, right_bound, tolerance, flag, lambda x: function(equation, x))
                             st.write(f"Root: {root}, Iterations: {iterations}")
                     else:
                         if person == "Daniel":
                             if st.button("Calculate Root"):
-                                root, iterations = daniel_bisection.bisection(left_bound, right_bound, tolerance, flag, lambda x: evaluate_function(corrected_equation, x))
+                                root, iterations = daniel_bisection.bisection(left_bound, right_bound, tolerance, flag, lambda x: function(equation, x))
                                 st.write(f"Root: {root}, Iterations: {iterations}")
                 elif method == "False Position Method" and user_input_valid:
                     if person == "Mark":
                         if st.button("Calculate Root"):
-                            root, iterations = mark_false_position.falsePositionMethod(left_bound, right_bound, tolerance, flag, lambda x: evaluate_function(corrected_equation, x))
+                            root, iterations = mark_false_position.falsePositionMethod(left_bound, right_bound, tolerance, flag, lambda x: function(equation, x))
                             st.write(f"Root: {root}, Iterations: {iterations}")
                     elif person == "Jhon":
                         if st.button("Calculate Root"):
-                            root, iterations = jhon_false_position.false_position_method(left_bound, right_bound, tolerance, flag, lambda x: evaluate_function(corrected_equation, x))
+                            root, iterations = jhon_false_position.false_position_method(left_bound, right_bound, tolerance, flag, lambda x: function(equation, x))
                             st.write(f"Root: {root}, Iterations: {iterations}")
                     elif person == "Francis":
                         if st.button("Calculate Root"):
-                            root, iterations = franky_false_position.regulafalsi(left_bound, right_bound, tolerance, flag, lambda x: evaluate_function(corrected_equation, x))
+                            root, iterations = franky_false_position.regulafalsi(left_bound, right_bound, tolerance, flag, lambda x: function(equation, x))
                             st.write(f"Root: {root}, Iterations: {iterations}")
                     else:
                         if person == "Daniel":
                             if st.button("Calculate Root"):
-                                root, iterations = daniel_false_position.falsePosition(left_bound, right_bound, tolerance, flag, lambda x: evaluate_function(corrected_equation, x))
+                                root, iterations = daniel_false_position.falsePosition(left_bound, right_bound, tolerance, flag, lambda x: function(equation, x))
                                 st.write(f"Root: {root}, Iterations: {iterations}")
                 elif method == "False Position Method" and user_input_valid:
                     if person == "Mark":
                         if st.button("Calculate Root"):
-                            root, iterations = mark_false_position.falsePositionMethod(left_bound, right_bound, tolerance, flag, lambda x: evaluate_function(corrected_equation, x))
+                            root, iterations = mark_false_position.falsePositionMethod(left_bound, right_bound, tolerance, flag, lambda x: function(equation, x))
                             st.write(f"Root: {root}, Iterations: {iterations}")
                     elif person == "Jhon":
                         if st.button("Calculate Root"):
-                            root, iterations = jhon_false_position.false_position_method(left_bound, right_bound, tolerance, flag, lambda x: evaluate_function(corrected_equation, x))
+                            root, iterations = jhon_false_position.false_position_method(left_bound, right_bound, tolerance, flag, lambda x: function(equation, x))
                             st.write(f"Root: {root}, Iterations: {iterations}")
                     elif person == "Francis":
                         if st.button("Calculate Root"):
-                            root, iterations = franky_false_position.regulafalsi(left_bound, right_bound, tolerance, flag, lambda x: evaluate_function(corrected_equation, x))
+                            root, iterations = franky_false_position.regulafalsi(left_bound, right_bound, tolerance, flag, lambda x: function(equation, x))
                             st.write(f"Root: {root}, Iterations: {iterations}")
                     else:
                         if person == "Daniel":
                             if st.button("Calculate Root"):
-                                root, iterations = daniel_false_position.falsePosition(left_bound, right_bound, tolerance, flag, lambda x: evaluate_function(corrected_equation, x))
+                                root, iterations = daniel_false_position.falsePosition(left_bound, right_bound, tolerance, flag, lambda x: function(equation, x))
                                 st.write(f"Root: {root}, Iterations: {iterations}")
                 elif method == "Secant Method":
                     if person == "Mark":
                         if st.button("Calculate Root"):
-                            root, iterations = mark_secant.secantMethod(left_bound, right_bound, tolerance, flag, lambda x: evaluate_function(corrected_equation, x))
+                            root, iterations = mark_secant.secantMethod(left_bound, right_bound, tolerance, flag, lambda x: function(equation, x))
                             st.write(f"Root: {root}, Iterations: {iterations}")
                     elif person == "Jhon":
                         if st.button("Calculate Root"):
-                            root, iterations = jhon_secant.secant_method(left_bound, right_bound, tolerance, flag, lambda x: evaluate_function(corrected_equation, x))
+                            root, iterations = jhon_secant.secant_method(left_bound, right_bound, tolerance, flag, lambda x: function(equation, x))
                             st.write(f"Root: {root}, Iterations: {iterations}")
                     elif person == "Francis":
                         if st.button("Calculate Root"):
-                            root, iterations = franky_secant.secant(left_bound, right_bound, tolerance, flag, lambda x: evaluate_function(corrected_equation, x))
+                            root, iterations = franky_secant.secant(left_bound, right_bound, tolerance, flag,lambda x: function(equation, x))
                             st.write(f"Root: {root}, Iterations: {iterations}")
                     else:
                         if person == "Daniel":
                             if st.button("Calculate Root"):
-                                root, iterations = daniel_secant.secant(left_bound, right_bound, tolerance, flag, lambda x: evaluate_function(corrected_equation, x))
+                                root, iterations = daniel_secant.secant(left_bound, right_bound, tolerance, flag, lambda x: function(equation, x))
                                 st.write(f"Root: {root}, Iterations: {iterations}")
 main()
