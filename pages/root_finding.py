@@ -1,7 +1,8 @@
 import streamlit as st
 import sympy as sp
 import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd
+import plotly.express as px
 import os, sys
 
 ROOT = os.path.dirname(os.path.dirname(__file__))
@@ -58,38 +59,18 @@ def main():
             
         function = sp.lambdify(x_expression, expr, "numpy")
         derivative_function = sp.lambdify(x_expression, sp.diff(expr, x_expression))
-            
-        # Plotting the function
-        x = np.linspace(-10, 10, 1600)
-        y = function(x)
-        fig, ax = plt.subplots(figsize=(20, 20))
-
-        # Plot
-        ax.plot(x, y, color='red', linewidth=2)
-
-        # Center axes
-        ax.spines['left'].set_position('zero')
-        ax.spines['bottom'].set_position('zero')
-        ax.spines['right'].set_color('none')
-        ax.spines['top'].set_color('none')
-
-        # Ticks
-        ax.set_xticks(np.arange(-10, 11, 1))
-        ax.set_yticks(np.arange(-10, 11, 1))
-        ax.tick_params(length=5, width=1)
-
-        # Grid
-        ax.grid(True, linestyle='--', linewidth=0.5, alpha=0.5)
-
-        # Limits
-        ax.set_xlim(-10, 10)
-        ax.set_ylim(-10, 10)
-
-        # Labels
-        ax.set_title(f"f(x) = {equation}")
-
-        st.pyplot(fig)
-        plt.clf()
+        
+        x_graph = np.linspace(-10, 10, 1600)
+        y_graph = function(x_graph)
+        
+        df = pd.DataFrame({"x": x_graph, "y": y_graph})
+        
+        fig = px.line(df, x = "x", y = "y", title=f"Graph of y = {equation}")
+        
+        fig.update_xaxes(range=[-10, 10], tick0=-10, dtick=1)
+        fig.update_yaxes(range=[-10, 10], tick0=-10, dtick=1)
+        
+        st.plotly_chart(fig)
         
         method = st.selectbox("Select a root-finding method:", ["None", "Bisection Method", "False Position Method", "Secant Method", "Newton Method"])
         person = st.selectbox("Person:", ["None", "Mark", "Francis", "Daniel", "Jhon"])
@@ -207,3 +188,4 @@ def main():
                                 root, iterations = daniel_secant.secant(left_bound, right_bound, tolerance, flag, function)
                                 st.write(f"Root: {root}, Iterations: {iterations}")
 main()
+
