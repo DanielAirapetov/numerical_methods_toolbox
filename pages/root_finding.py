@@ -32,6 +32,7 @@ from sections.root_finding.secant import daniel_secant
 from sections.root_finding.newton import mark_newton
 from sections.root_finding.newton import jhon_newton
 from sections.root_finding.newton import daniel_newton
+from sections.root_finding.newton import franky_newton
 
 def main():
     st.markdown(
@@ -72,8 +73,8 @@ def main():
         
         fig = px.line(df, x = "x", y = "y", title=f"Graph of y = {equation}")
         
-        fig.update_xaxes(range=[-10, 10], tick0=-10, dtick=1)
-        fig.update_yaxes(range=[-10, 10], tick0=-10, dtick=1)
+        fig.update_xaxes(range = [-10, 10], tick0 = -10, dtick = 1, zeroline = True, zerolinewidth = 2, zerolinecolor = 'white')
+        fig.update_yaxes(range = [-10, 10], tick0 = -10, dtick = 1, zeroline = True, zerolinewidth = 2, zerolinecolor = 'white')
         
         st.plotly_chart(fig)
         
@@ -107,6 +108,11 @@ def main():
                         if st.button("Calculate Root"):
                             root, iterations = jhon_newton.newton_method(initial_guess, tolerance, flag, expr)
                             st.write(f"Root: {root}, Iterations: {iterations}")
+                    else:
+                        if person == "Francis":
+                            if st.button("Calculate Root"):
+                                root, iterations = franky_newton.newton(initial_guess, tolerance, flag, expr)
+                                st.write(f"Root: {root}, Iterations: {iterations}")
                 
             else:
                 left_bound = st.number_input("Enter the left bound:", value=0.0, format="%.4f")
