@@ -3,6 +3,10 @@ import pandas as pd
 import numpy as np
 import os, sys
 
+st.set_page_config(
+    page_title ="Linear Systems",
+    initial_sidebar_state ="collapsed" 
+)
 
 # Add project ROOT so imports work
 ROOT = os.path.dirname(os.path.dirname(__file__))
