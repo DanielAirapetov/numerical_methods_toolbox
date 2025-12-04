@@ -90,7 +90,7 @@ def main():
 
     if method_type == "Direct":
         method = st.selectbox("Choose a method:", ["Gaussian", "Gauss-Jordan"])
-        input_type = st.selectbox("Choose a input type: ", ["CSV", "GUI"])
+        input_type = st.selectbox("Choose a input type: ", ["GUI", "CSV"])
         matrix = getMatrix(input_type)
         member = selectMember()
 
@@ -128,7 +128,7 @@ def main():
 
     else:  # Iterative
         method = st.selectbox("Choose a method:", ["Gauss-Seidel", "Jacobi"])
-        input_type = st.selectbox("Choose an input type: ", ["CSV", "GUI"])
+        input_type = st.selectbox("Choose an input type: ", ["GUI", "CSV"])
         matrix = getMatrix(input_type)
         member = selectMember()
 
@@ -171,3 +171,6 @@ def main():
                     printResults(results, method, member)
                     if iters is not None:
                         st.write("Iterations:", iters)
+
+if __name__ == "__main__":
+    main()

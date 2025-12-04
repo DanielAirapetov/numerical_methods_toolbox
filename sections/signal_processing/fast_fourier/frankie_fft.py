@@ -33,8 +33,3 @@ def fast_fourier_transform(x):
         h *= 2 # group by increasing  by powers of 2 
     return x
 
-
-
-
-
-
