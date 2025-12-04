@@ -37,6 +37,7 @@ def createMatrix():
 
     # Controls BELOW the table
     col1, col2 = st.columns(2)
+
     with col1:
         new_rows = st.number_input(
             "Rows", min_value=1, max_value=10,
@@ -44,16 +45,20 @@ def createMatrix():
         )
     with col2:
         new_cols = st.number_input(
-            "Columns", min_value=1, max_value=10,
+            "Columns", min_value=2, max_value=10,
             value=st.session_state.cols, key="cols_input"
         )
+    
 
     # If user changes rows/cols → update state and rerun
     if new_rows != st.session_state.rows or new_cols != st.session_state.cols:
         st.session_state.rows = new_rows
         st.session_state.cols = new_cols
         st.rerun()   # rebuild the table with new shape
-
+    
+    if new_cols != new_rows + 1: # make sure user inputs an nxn augmented matrix
+        st.error("Must be nxn augmented matrix (make sure you have one more column than rows)")
+    
     return edited_df.to_numpy(float)
 
 
@@ -66,7 +71,10 @@ def getMatrix(input_type):
             st.info("Please upload a CSV file to continue.")
             return None
         df = pd.read_csv(uploaded, header=None)
-        return df.to_numpy(dtype=float)         
+        csv_mat = df.to_numpy(dtype=float)
+        if csv_mat.shape[1] != csv_mat.shape[0]:
+            st.error("Must be nxn augmented matrix (make sure you have one more column than rows)")
+        return csv_mat      
 
 
 def selectMember():
