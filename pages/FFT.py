@@ -4,6 +4,11 @@ import pandas as pd
 import altair as alt
 import os, sys
 
+st.set_page_config(
+    page_title = "Signal Processing",
+    initial_sidebar_state = "collapsed" 
+)
+
 ROOT = os.path.dirname(os.path.dirname(__file__))
 if ROOT not in sys.path:
     sys.path.append(ROOT)
