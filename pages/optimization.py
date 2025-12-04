@@ -1,10 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-
 import plotly.graph_objects as go
-
-import altair as alt
 import sympy as sp
 import os, sys
 
@@ -269,22 +266,28 @@ def main():
                 "Left Bound",
                 value = -5.0,
                 step=0.1,
-                key="left_bound"
             )
 
             if contains_log and a <= 0:
-                a = 0.01
+                a = st.number_input(
+                        "Left Bound",
+                        value = 0.01,
+                        step = 0.1,
+                        )
 
         with right_interval:
             b = st.number_input(
                 "Right Bound",
                 value=5.0,
                 step=0.1,
-                key="right_bound"
             )
 
             if contains_log and b <= 0:
-                b = 0.01
+                b = st.number_input(
+                        "Right Bound",
+                        value = 0.01,
+                        step = 0.1,
+                        )
 
         # recompute the plot using bounds entered by user
         x_points = np.linspace(a, b, 500)
