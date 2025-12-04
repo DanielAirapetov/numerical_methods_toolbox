@@ -73,89 +73,90 @@ def selectMember():
     return st.selectbox("Select whose method to use:", ["Daniel", "Francis", "Jhon", "Mark"])
 
 
-st.title("Systems of Equations Methods Calculator")
-method_type = st.selectbox("Choose a method type:", ["Direct", "Iterative"])
+def main():
+    st.title("Systems of Equations Methods Calculator")
+    method_type = st.selectbox("Choose a method type:", ["Direct", "Iterative"])
 
-if method_type == "Direct":
-    method = st.selectbox("Choose a method:", ["Gaussian", "Gauss-Jordan"])
-    input_type = st.selectbox("Choose a input type: ", ["CSV", "GUI"])
-    matrix = getMatrix(input_type)
-    member = selectMember()
+    if method_type == "Direct":
+        method = st.selectbox("Choose a method:", ["Gaussian", "Gauss-Jordan"])
+        input_type = st.selectbox("Choose a input type: ", ["CSV", "GUI"])
+        matrix = getMatrix(input_type)
+        member = selectMember()
 
-    if st.button("Solve Direct"):
-        if matrix is None:
-            st.error("Please provide a matrix first.")
-        else:
-            results = None
-
-            if member == "Francis":
-                if method == "Gaussian":
-                    reduced = frankieG.gauss_elim(matrix.copy())
-                    results = frankieG.back_sub(reduced)
-                else:  # Gauss-Jordan
-                    results = frankieGJ.GJ_elim(matrix.copy())
-
-            elif member == "Mark":
-                if method == "Gaussian":
-                    results = markG.gaussianEliminationMethod(matrix.copy())
-                else:  # Gauss-Jordan
-                    results = markGJ.gaussJordanElimination(matrix.copy())
-
-            elif member == "Daniel":
-                list = matrix.tolist()
-                if method == "Gaussian":
-                    results = danielG.gaussian_elimination(list)
-                else:  # Gauss-Jordan
-                    results = danielGJ.gauss_jordan_elimination(list)
-
+        if st.button("Solve Direct"):
+            if matrix is None:
+                st.error("Please provide a matrix first.")
             else:
-                st.error("Still dont have jhons direct elim functions")
-                    
-            if results is not None:
-                printResults(results, method, member)
+                results = None
 
-else:  # Iterative
-    method = st.selectbox("Choose a method:", ["Gauss-Seidel", "Jacobi"])
-    input_type = st.selectbox("Choose an input type: ", ["CSV", "GUI"])
-    matrix = getMatrix(input_type)
-    member = selectMember()
+                if member == "Francis":
+                    if method == "Gaussian":
+                        reduced = frankieG.gauss_elim(matrix.copy())
+                        results = frankieG.back_sub(reduced)
+                    else:  # Gauss-Jordan
+                        results = frankieGJ.GJ_elim(matrix.copy())
 
-    if st.button("Solve Iterative"):
-        if matrix is None:
-            st.error("Please provide a matrix first.")
-        else:
-            initial = np.zeros(matrix.shape[0])
-            tolerance = 0.001
-            flag = 4
+                elif member == "Mark":
+                    if method == "Gaussian":
+                        results = markG.gaussianEliminationMethod(matrix.copy())
+                    else:  # Gauss-Jordan
+                        results = markGJ.gaussJordanElimination(matrix.copy())
 
-            results = None
-            iters = None
+                elif member == "Daniel":
+                    list = matrix.tolist()
+                    if method == "Gaussian":
+                        results = danielG.gaussian_elimination(list)
+                    else:  # Gauss-Jordan
+                        results = danielGJ.gauss_jordan_elimination(list)
 
-            if member == "Francis":
-                if method == "Gauss-Seidel":
-                    results, iters = frankieGS.GaussSiedel(matrix, initial, tolerance, flag)
-                else:  # Jacobi
-                    results, iters = frankieJ.Jacobi(matrix, initial, tolerance, flag)
-
-            elif member == "Daniel":
-                list = matrix.tolist()
-                if method == "Gauss-Seidel":
-                    results, iters = danielGS.gauss_seidel_iterative_method(list, tolerance, flag)
-                else:  # Jacobi
-                    results, iters = danielJ.jacobi_iterative_method(list, tolerance, flag)
-
-            elif member == "Mark":
-                if method == "Gauss-Seidel":
-                    results, iters = markGS.gaussSeidelMethod(matrix, tolerance, flag)
                 else:
-                    results, iters = markJ.gaussSeidelMethod(matrix, tolerance, flag)
-            else: #Jhon
-                if method == "Gauss-Seidel":
-                    results, iters = jhonGS.gauss_seidel(matrix,tolerance,flag)
-                else:
-                    results, iters = jhonJ.jacobi_method(matrix,tolerance,flag)
-    
-            if results is not None:
-                printResults(results, method, member)
-                if iters is not None:
-                    st.write("Iterations:", iters)
+                    st.error("Still dont have jhons direct elim functions")
+                        
+                if results is not None:
+                    printResults(results, method, member)
+
+    else:  # Iterative
+        method = st.selectbox("Choose a method:", ["Gauss-Seidel", "Jacobi"])
+        input_type = st.selectbox("Choose an input type: ", ["CSV", "GUI"])
+        matrix = getMatrix(input_type)
+        member = selectMember()
+
+        if st.button("Solve Iterative"):
+            if matrix is None:
+                st.error("Please provide a matrix first.")
+            else:
+                initial = np.zeros(matrix.shape[0])
+                tolerance = 0.001
+                flag = 4
+
+                results = None
+                iters = None
+
+                if member == "Francis":
+                    if method == "Gauss-Seidel":
+                        results, iters = frankieGS.GaussSiedel(matrix, initial, tolerance, flag)
+                    else:  # Jacobi
+                        results, iters = frankieJ.Jacobi(matrix, initial, tolerance, flag)
+
+                elif member == "Daniel":
+                    list = matrix.tolist()
+                    if method == "Gauss-Seidel":
+                        results, iters = danielGS.gauss_seidel_iterative_method(list, tolerance, flag)
+                    else:  # Jacobi
+                        results, iters = danielJ.jacobi_iterative_method(list, tolerance, flag)
+
+                elif member == "Mark":
+                    if method == "Gauss-Seidel":
+                        results, iters = markGS.gaussSeidelMethod(matrix, tolerance, flag)
+                    else:
+                        results, iters = markJ.gaussSeidelMethod(matrix, tolerance, flag)
+                else: #Jhon
+                    if method == "Gauss-Seidel":
+                        results, iters = jhonGS.gauss_seidel(matrix,tolerance,flag)
+                    else:
+                        results, iters = jhonJ.jacobi_method(matrix,tolerance,flag)
+        
+                if results is not None:
+                    printResults(results, method, member)
+                    if iters is not None:
+                        st.write("Iterations:", iters)
