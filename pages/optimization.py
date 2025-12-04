@@ -26,8 +26,8 @@ def safe_eval(func: str, x):
     }
     return eval(func, {"__builtins__": {}}, allowed)
 
-def float_input(label, default):
-    text = st.text_input(label, value=str(default))
+def float_input(label, default, key):
+    text = st.text_input(label, value=str(default), key = key)
     try:
         return float(text)
     except ValueError:
@@ -37,6 +37,7 @@ def float_input(label, default):
 
 
 def main():
+
     if "compute_goldenSection" not in st.session_state:
         st.session_state["compute_goldenSection"] = False
     if "compute_newtonMinMax" not in st.session_state:
@@ -122,7 +123,11 @@ def main():
                     options = ["Daniel", "Jhon", "Mark", "Francis"]
                     )
         with delta_col:
-            delta = float_input("Error threshold", "")
+            delta = float_input("Error threshold", "", key= "delta_key")
+            invalid_delta = False
+            if delta != None and delta <= 0:
+                invalid_delta = True
+                st.error("Error threshold must be greater than 0")
 
 
 
@@ -134,18 +139,18 @@ def main():
             input_box1, input_box2 = st.columns(2)
 
             with input_box1:
-                left_bound = float_input("a: ", "")
+                left_bound = float_input("a: ", "", key = "left_bound_key")
             with input_box2:
-                right_bound = float_input("b: ", "")
+                right_bound = float_input("b: ", "", key = "right_bound_key")
 
-            invalid_bounds = False
+            invalid_bound = False
             if contains_log:
                 if left_bound != None and left_bound <= 0:
-                    st.error("log(x) is undefined for values less than or equal to 0")
-                    invalid_bounds = True
+                    st.error("a: log(x) is undefined for values less than or equal to 0")
+                    invalid_bound = True
                 if right_bound != None and right_bound <= 0:
-                    st.error("log(x) is undefined for values less than or equal to 0")
-                    invalid_bounds = True
+                    st.error("b: log(x) is undefined for values less than or equal to 0")
+                    invalid_bound = True
 
             min_max = st.segmented_control(
                     "",
@@ -158,12 +163,12 @@ def main():
                 flag = 2
 
         else:
-            left_bound = float_input("Initial Guess: ", "")
+            left_bound = float_input("Initial Guess: ", "", key = "left_bound_key")
             
-            invalid_bounds = False
+            invalid_bound = False
             if left_bound != None and left_bound <= 0:
                 st.error("log(x) is undefined for values less than or equal to 0")
-                invalid_bounds = True
+                invalid_bound = True
 
 
         compute_button, computed_result = st.columns([1, 1])
@@ -171,7 +176,8 @@ def main():
         
         with compute_button:
 
-            if st.button("Compute", disabled = invalid_bounds):
+            disable_compute = invalid_bound or invalid_delta
+            if st.button("Compute", disabled = invalid_bound or invalid_delta):
                 if function_text.strip() != "" and delta != None:
                     if method == "Golden Section" and left_bound != None and right_bound != None:
                         st.session_state["compute_goldenSection"] = True
@@ -266,6 +272,9 @@ def main():
                 key="left_bound"
             )
 
+            if contains_log and a <= 0:
+                a = 0.01
+
         with right_interval:
             b = st.number_input(
                 "Right Bound",
@@ -273,6 +282,9 @@ def main():
                 step=0.1,
                 key="right_bound"
             )
+
+            if contains_log and b <= 0:
+                b = 0.01
 
         # recompute the plot using bounds entered by user
         x_points = np.linspace(a, b, 500)
