@@ -86,7 +86,7 @@ def main():
             flag = st.selectbox("Select a flag:", [1, 2, 3, 4])     
             
             if method == "Newton Method":
-                initial_guess = st.number_input("Enter the initial x value:", value=0.0, format="%.4f")
+                initial_guess = st.number_input("Enter the initial x value:", value=0.0, format="%.2f")
                 
                 user_input_valid = False
                 
@@ -115,8 +115,8 @@ def main():
                                 st.write(f"Root: {root}, Iterations: {iterations}")
                 
             else:
-                left_bound = st.number_input("Enter the left bound:", value=0.0, format="%.4f")
-                right_bound = st.number_input("Enter the right bound:", value=0.0, format="%.4f")
+                left_bound = st.number_input("Enter the left bound:", value=0.0, format="%.2f")
+                right_bound = st.number_input("Enter the right bound:", value=0.0, format="%.2f")
                 
                 user_input_valid = False
                 
