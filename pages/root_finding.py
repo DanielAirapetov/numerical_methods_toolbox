@@ -5,6 +5,11 @@ import pandas as pd
 import plotly.express as px
 import os, sys
 
+st.set_page_config(
+    page_title="Solving Nonlinear Equations",
+    initial_sidebar_state="collapsed" 
+)
+
 ROOT = os.path.dirname(os.path.dirname(__file__))
 if ROOT not in sys.path:
     sys.path.append(ROOT)

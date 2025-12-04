@@ -3,6 +3,10 @@ import pandas as pd
 import numpy as np
 import os, sys
 
+st.set_page_config(
+    page_title ="Linear Systems",
+    initial_sidebar_state ="collapsed" 
+)
 
 # Add project ROOT so imports work
 ROOT = os.path.dirname(os.path.dirname(__file__))
@@ -80,14 +84,13 @@ def getMatrix(input_type):
 def selectMember():
     return st.selectbox("Select whose method to use:", ["Daniel", "Francis", "Jhon", "Mark"])
 
-
 def main():
     st.title("Systems of Equations Methods Calculator")
     method_type = st.selectbox("Choose a method type:", ["Direct", "Iterative"])
 
     if method_type == "Direct":
         method = st.selectbox("Choose a method:", ["Gaussian", "Gauss-Jordan"])
-        input_type = st.selectbox("Choose a input type: ", ["GUI","CSV"])
+        input_type = st.selectbox("Choose a input type: ", ["CSV", "GUI"])
         matrix = getMatrix(input_type)
         member = selectMember()
 
@@ -125,7 +128,7 @@ def main():
 
     else:  # Iterative
         method = st.selectbox("Choose a method:", ["Gauss-Seidel", "Jacobi"])
-        input_type = st.selectbox("Choose an input type: ", ["GUI", "CSV"])
+        input_type = st.selectbox("Choose an input type: ", ["CSV", "GUI"])
         matrix = getMatrix(input_type)
         member = selectMember()
 
@@ -168,7 +171,3 @@ def main():
                     printResults(results, method, member)
                     if iters is not None:
                         st.write("Iterations:", iters)
-
-if __name__ == "__main__":
-    main()
-    

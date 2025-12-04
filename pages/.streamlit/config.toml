@@ -3,6 +3,5 @@ backgroundColor = "#0e1b29"
 secondaryBackgroundColor = "#182635"
 textColor = "#E0E6ED"   
 primaryColor = "#5A7D9A"
-
-# font = "Inter"
 font = "monospace"
+
