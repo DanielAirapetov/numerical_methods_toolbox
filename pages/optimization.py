@@ -76,6 +76,11 @@ def main():
         st.markdown("<div style='height:90px'></div>", unsafe_allow_html=True)
 
         st.write("## Enter a Function")
+
+        # when a new function is entered reset this before checking again
+        discontinuous = False
+        
+
         function_text = st.text_input("f(x) =", value="")
         
         if function_text.strip():
@@ -104,7 +109,6 @@ def main():
         # check if the symbolic function has a log in it
         # need to make sure user doesn't input anything less than or equal to 0 for the bounds
         if function_symbolic != None and function_symbolic.has(sp.log):
-            st.error("log(x) has no Min/Max")
             contains_log = True
         else:
             contains_log = False
@@ -122,7 +126,7 @@ def main():
         with member_col:
             member = st.selectbox(
                     "Choose a member",
-                    options = ["Mark", "Daniel", "Jhon", "Francis"]
+                    options = ["Daniel", "Jhon", "Mark", "Francis"]
                     )
         with delta_col:
             delta = float_input("Error threshold", "", key= "delta_key")
@@ -140,10 +144,22 @@ def main():
 
             input_box1, input_box2 = st.columns(2)
 
+
+            invalid_bound_a = False
+            invalid_bound_b = False
+
             with input_box1:
                 left_bound = float_input("a: ", "", key = "left_bound_key")
+                if contains_log and left_bound != None:
+                    if left_bound <= 0:
+                        invalid_bound_a = True
+                        st.error("a: log(x) not defined for x <= 0")
             with input_box2:
                 right_bound = float_input("b: ", "", key = "right_bound_key")
+                if contains_log and right_bound != None:
+                    if right_bound <= 0:
+                        invalid_bound_b = True
+                        st.error("b: log(x) not defined for x <= 0")
 
 
             min_col, mid_space, max_col = st.columns([1, 0.001, 1])
@@ -173,16 +189,38 @@ def main():
 
 
         else:
-                left_bound = float_input("Initial Guess: ", "", key = "left_bound_key")
-            
+
+            invalid_bound_a = False
+            invalid_bound_b = False
+
+            left_bound = float_input("Initial Guess: ", "", key = "left_bound_key")
+
+            if contains_log and left_bound != None:
+                if left_bound <= 0:
+                    invalid_bound_a = True
+                    invalid_bound_b = True
+                    st.error("log(x) not defined for x <= 0")
+
+            # check for discontinuity
+            #if function_symbolic != None and left_bound != None:
+
+
 
         compute_button, mid_space2, computed_result = st.columns([1, 0.001, 1])
         
+
         with compute_button:
-            disable_compute = contains_log or invalid_delta
-            if st.button("Compute", disabled = contains_log or invalid_delta, use_container_width = True):
-                if function_text.strip() != "" and delta != None:
+
+            
+            disable_compute =  invalid_bound_a or invalid_bound_b or invalid_delta or discontinuous
+
+
+            if st.button("Compute", disabled = disable_compute, use_container_width = True):
+
+                if function_symbolic != None and function_symbolic != 0 and delta != None:
+
                     if method == "Golden Section" and left_bound != None and right_bound != None:
+
                         st.session_state["compute_goldenSection"] = True
                         st.session_state["compute_newtonMinMax"] = False
                         
@@ -195,7 +233,9 @@ def main():
                                 "member": member,
                                 "func": function_symbolic
                                 }
+
                     elif method == "Newton Min/Max" and left_bound != None:
+
                         st.session_state["compute_goldenSection"] = False
                         st.session_state["compute_newtonMinMax"] = True
 
@@ -217,12 +257,12 @@ def main():
                 inputs = st.session_state["inputs"]
                 st.session_state["compute_goldenSection"] = False
 
-                if member == "Mark":
-                    result, iterations = mark.goldenSectionMethod(inputs["a"], inputs["b"], inputs["delta"], inputs["flag"], inputs["func"])
-                elif member == "Daniel":
+                if member == "Daniel":
                     result, iterations = daniel.goldenSectionMethod(inputs["a"], inputs["b"], inputs["delta"], inputs["flag"], inputs["func"])
                 elif member == "Jhon":
                     result, iterations = jhon.goldenSectionMethod(inputs["a"], inputs["b"], inputs["delta"], inputs["flag"], inputs["func"])
+                elif member == "Mark":
+                    result, iterations = mark.goldenSectionMethod(inputs["a"], inputs["b"], inputs["delta"], inputs["flag"], inputs["func"])
                 elif member == "Francis":
                     result, iterations = francis.goldenSectionMethod(inputs["a"], inputs["b"], inputs["delta"], inputs["flag"], inputs["func"])
 
@@ -233,12 +273,12 @@ def main():
                 inputs = st.session_state["inputs"]
                 st.session_state["compute_newtonMinMax"] = False
 
-                if member == "Mark":
-                    result, iterations = mark.newtonMinMaxMethod(inputs["a"], inputs["delta"], inputs["func"])
-                elif member == "Daniel":
+                if member == "Daniel":
                     result, iterations = daniel.newtonMinMaxMethod(inputs["a"], inputs["delta"], inputs["func"])
                 elif member == "Jhon":
                     result, iterations = jhon.newtonMinMaxMethod(inputs["a"], inputs["delta"], inputs["func"])
+                elif member == "Mark":
+                    result, iterations = mark.newtonMinMaxMethod(inputs["a"], inputs["delta"], inputs["func"])
                 elif member == "Francis":
                     result, iterations = francis.newtonMinMaxMethod(inputs["a"], inputs["delta"], inputs["func"])
 
@@ -269,14 +309,19 @@ def main():
 
         with left_interval:
             a = float_input("Left Bound", -5.00, key = "left_interval_key")
-
+            if contains_log and a != None:
+                if a <= 0:
+                    st.error("log(x) not defined for x <= 0. Change the bound to plot the function")
         with right_interval:
             b = float_input("Right Bound", 5.00, key = "right_interval_key")
+            if contains_log and b != None:
+                if b <= 0:
+                    st.error("log(x) not defined for x <= 0. Change the bound to plot the function")
 
 
         # recompute the plot using bounds entered by user
         if a != None and b != None:
-            x_points = np.linspace(a, b, 500)
+            x_points = np.linspace(a, b, 300)
             y_points = np.full_like(x_points, np.nan)
 
         if function_text.strip() != "":
@@ -311,10 +356,7 @@ def main():
             showlegend=False,
         )
 
-        fig.update_xaxes(showgrid=True, gridwidth=0.5, gridcolor="gray", dtick = 1)
-        fig.update_yaxes(showgrid=True, gridwidth=0.5, gridcolor="gray", dtick = 1)
-
-        # Render Plotly chart
+        # render plotly chart
         plot_placeholder.plotly_chart(fig, use_container_width=False)
 
         st.markdown("</div>", unsafe_allow_html=True)
