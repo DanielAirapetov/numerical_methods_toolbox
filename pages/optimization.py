@@ -10,7 +10,9 @@ ROOT = os.path.dirname(os.path.dirname(__file__))
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 
+
 from sections.optimization.members import daniel, jhon, mark, francis
+
 
 def safe_eval(func: str, x):
     allowed = {
@@ -23,6 +25,7 @@ def safe_eval(func: str, x):
     }
     return eval(func, {"__builtins__": {}}, allowed)
 
+
 def float_input(label, default, key):
     text = st.text_input(label, value=str(default), key = key)
     try:
@@ -30,7 +33,12 @@ def float_input(label, default, key):
     except ValueError:
         return None
 
+# set_min and set_max are helper functions used to set the session_state of the min and max buttons for the golden section method
+def set_min():
+    st.session_state["minmax"] = "Minimum"
 
+def set_max():
+    st.session_state["minmax"] = "Maximum"
 
 
 def main():
@@ -43,25 +51,19 @@ def main():
         st.session_state["inputs"] = None
     if "outputs" not in st.session_state:
         st.session_state["outputs"] = None
+    if "minmax" not in st.session_state:
+        st.session_state["minmax"] = "Minimum"
 
 
 
-
-    # set page layout to wide
     st.set_page_config(layout="wide")
+
 
     # set the title with some html for centering and margins
     st.markdown("<h1 style='text-align:center; margin-bottom:10px; margin-top:-30px'>Optimization Methods</h1>",unsafe_allow_html=True)
 
-    # used to safely evaluate an inputed function
 
 
-
-
-
-
-
-    # center the layout
     # add blank space on left and right
     # center the plots and input
     left, center_left, center_right, right = st.columns([1, 4, 4, 1])
@@ -70,6 +72,8 @@ def main():
     # right side of page
     # inputs and selections
     with center_right:
+
+        st.markdown("<div style='height:90px'></div>", unsafe_allow_html=True)
 
         st.write("## Enter a Function")
         function_text = st.text_input("f(x) =", value="")
@@ -100,6 +104,7 @@ def main():
         # check if the symbolic function has a log in it
         # need to make sure user doesn't input anything less than or equal to 0 for the bounds
         if function_symbolic != None and function_symbolic.has(sp.log):
+            st.error("log(x) has no Min/Max")
             contains_log = True
         else:
             contains_log = False
@@ -117,7 +122,7 @@ def main():
         with member_col:
             member = st.selectbox(
                     "Choose a member",
-                    options = ["Daniel", "Jhon", "Mark", "Francis"]
+                    options = ["Mark", "Daniel", "Jhon", "Francis"]
                     )
         with delta_col:
             delta = float_input("Error threshold", "", key= "delta_key")
@@ -140,41 +145,42 @@ def main():
             with input_box2:
                 right_bound = float_input("b: ", "", key = "right_bound_key")
 
-            invalid_bound = False
-            if contains_log:
-                if left_bound != None and left_bound <= 0:
-                    st.error("a: log(x) is undefined for values less than or equal to 0")
-                    invalid_bound = True
-                if right_bound != None and right_bound <= 0:
-                    st.error("b: log(x) is undefined for values less than or equal to 0")
-                    invalid_bound = True
 
-            min_max = st.segmented_control(
-                    "",
-                    options = ["Minimum", "Maximum"],
-                    default = "Minimum"
-            )
-            if min_max == "Minimum":
-                flag = 1
-            else:
-                flag = 2
+            min_col, mid_space, max_col = st.columns([1, 0.001, 1])
+
+            if "minmax" not in st.session_state:
+                    st.session_state["minmax"] = "Minimum"
+
+            with min_col:
+                st.button(
+                        "Minimum",
+                        on_click = set_min,
+                        type = "primary" if st.session_state["minmax"] == "Minimum" else "secondary",
+                        use_container_width = True
+                        )
+
+            with max_col:
+                st.button(
+                        "Maximum",
+                        on_click = set_max,
+                        type = "primary" if st.session_state["minmax"] == "Maximum" else "secondary",
+                        use_container_width = True
+                        )
+
+            # use it like before
+            min_max = st.session_state["minmax"]
+            flag = 1 if min_max == "Minimum" else 2
+
 
         else:
-            left_bound = float_input("Initial Guess: ", "", key = "left_bound_key")
+                left_bound = float_input("Initial Guess: ", "", key = "left_bound_key")
             
-            invalid_bound = False
-            if left_bound != None and left_bound <= 0:
-                st.error("log(x) is undefined for values less than or equal to 0")
-                invalid_bound = True
 
-
-        compute_button, computed_result = st.columns([1, 1])
-
+        compute_button, mid_space2, computed_result = st.columns([1, 0.001, 1])
         
         with compute_button:
-
-            disable_compute = invalid_bound or invalid_delta
-            if st.button("Compute", disabled = invalid_bound or invalid_delta):
+            disable_compute = contains_log or invalid_delta
+            if st.button("Compute", disabled = contains_log or invalid_delta, use_container_width = True):
                 if function_text.strip() != "" and delta != None:
                     if method == "Golden Section" and left_bound != None and right_bound != None:
                         st.session_state["compute_goldenSection"] = True
@@ -211,12 +217,12 @@ def main():
                 inputs = st.session_state["inputs"]
                 st.session_state["compute_goldenSection"] = False
 
-                if member == "Daniel":
+                if member == "Mark":
+                    result, iterations = mark.goldenSectionMethod(inputs["a"], inputs["b"], inputs["delta"], inputs["flag"], inputs["func"])
+                elif member == "Daniel":
                     result, iterations = daniel.goldenSectionMethod(inputs["a"], inputs["b"], inputs["delta"], inputs["flag"], inputs["func"])
                 elif member == "Jhon":
                     result, iterations = jhon.goldenSectionMethod(inputs["a"], inputs["b"], inputs["delta"], inputs["flag"], inputs["func"])
-                elif member == "Mark":
-                    result, iterations = mark.goldenSectionMethod(inputs["a"], inputs["b"], inputs["delta"], inputs["flag"], inputs["func"])
                 elif member == "Francis":
                     result, iterations = francis.goldenSectionMethod(inputs["a"], inputs["b"], inputs["delta"], inputs["flag"], inputs["func"])
 
@@ -227,12 +233,12 @@ def main():
                 inputs = st.session_state["inputs"]
                 st.session_state["compute_newtonMinMax"] = False
 
-                if member == "Daniel":
+                if member == "Mark":
+                    result, iterations = mark.newtonMinMaxMethod(inputs["a"], inputs["delta"], inputs["func"])
+                elif member == "Daniel":
                     result, iterations = daniel.newtonMinMaxMethod(inputs["a"], inputs["delta"], inputs["func"])
                 elif member == "Jhon":
                     result, iterations = jhon.newtonMinMaxMethod(inputs["a"], inputs["delta"], inputs["func"])
-                elif member == "Mark":
-                    result, iterations = mark.newtonMinMaxMethod(inputs["a"], inputs["delta"], inputs["func"])
                 elif member == "Francis":
                     result, iterations = francis.newtonMinMaxMethod(inputs["a"], inputs["delta"], inputs["func"])
 
@@ -240,15 +246,15 @@ def main():
 
             if st.session_state.get("outputs", False) != None:
                 result, iterations = st.session_state["outputs"]
-                st.write(f"**Result:** {result}")
-                st.write(f"**Iterations:** {iterations}")
+                st.write(f"**Result:** {result}", f"**Iterations:** {iterations}")
 
 
 
 
-    # plot with interval bound inputs to increase or decrease the viewing window of the plotted function
+    # plotly plot with interval bounds as text inputs which are converted to floats in order to allow the user to change the bounds of the function
     with center_left:
 
+        st.markdown("<div id='plot-container'>", unsafe_allow_html=True)
         # plot
         x_points = np.linspace(-10, 10, 500)   # temporary defaults (will be overwritten)
         y_points = np.full_like(x_points, np.nan)
@@ -262,44 +268,29 @@ def main():
 
 
         with left_interval:
-            a = st.number_input(
-                "Left Bound",
-                value = -5.0,
-                step=0.1,
-            )
-
-            if contains_log and a <= 0:
-                a = st.number_input(
-                        "Left Bound",
-                        value = 0.01,
-                        step = 0.1,
-                        )
+            a = float_input("Left Bound", -5.00, key = "left_interval_key")
 
         with right_interval:
-            b = st.number_input(
-                "Right Bound",
-                value=5.0,
-                step=0.1,
-            )
+            b = float_input("Right Bound", 5.00, key = "right_interval_key")
 
-            if contains_log and b <= 0:
-                b = st.number_input(
-                        "Right Bound",
-                        value = 0.01,
-                        step = 0.1,
-                        )
 
         # recompute the plot using bounds entered by user
-        x_points = np.linspace(a, b, 500)
-        y_points = np.full_like(x_points, np.nan)
+        if a != None and b != None:
+            x_points = np.linspace(a, b, 500)
+            y_points = np.full_like(x_points, np.nan)
 
         if function_text.strip() != "":
             try:
                 y_points = safe_eval(function_text, x_points)
+                y_points = np.array(y_points, dtype = float)
+
+                if y_points.ndim == 0:
+                    y_points = np.array([y_points])
             except Exception as e:
                 plot_placeholder.error(f"Error evaluating function: {e}")
 
-        data = pd.DataFrame({"x": x_points, "f(x)": y_points})
+        if len(x_points) == len(y_points):
+            data = pd.DataFrame({"x": x_points, "f(x)": y_points})
 
         # Determine y-range
         if not np.isnan(y_points).all():
@@ -325,6 +316,8 @@ def main():
 
         # Render Plotly chart
         plot_placeholder.plotly_chart(fig, use_container_width=False)
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
