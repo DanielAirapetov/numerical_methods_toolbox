@@ -11,6 +11,7 @@ if ROOT not in sys.path:
     sys.path.append(ROOT)
 
 
+
 from sections.optimization.members import daniel, jhon, mark, francis
 
 
@@ -41,7 +42,13 @@ def set_max():
     st.session_state["minmax"] = "Maximum"
 
 
+
+
+
+
 def main():
+
+    st.set_page_config(layout="wide")
 
     if "compute_goldenSection" not in st.session_state:
         st.session_state["compute_goldenSection"] = False
@@ -56,11 +63,11 @@ def main():
 
 
 
-    st.set_page_config(layout="wide")
-
+    if st.button("Back"):
+        st.switch_page("app.py")
 
     # set the title with some html for centering and margins
-    st.markdown("<h1 style='text-align:center; margin-bottom:10px; margin-top:-30px'>Optimization Methods</h1>",unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center; margin-bottom:-l0px; margin-top:-30px'>Optimization Methods</h1>",unsafe_allow_html=True)
 
 
 
@@ -286,7 +293,8 @@ def main():
 
             if st.session_state.get("outputs", False) != None:
                 result, iterations = st.session_state["outputs"]
-                st.write(f"**Result:** {result}", f"**Iterations:** {iterations}")
+                st.write(f"**Result:** {result}")
+                st.write(f"**Iterations:** {iterations}")
 
 
 

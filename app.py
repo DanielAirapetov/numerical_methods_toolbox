@@ -1,7 +1,10 @@
 import streamlit as st
-from PIL import Image
-import base64
-from io import BytesIO
+#from PIL import Image
+#import base64
+#from io import BytesIO
+
+
+#from pages import about, calculus, home, linear_systems, optimization, root_finding, signal_processing
 
 pages = [
     ["Solving Nonlinear Equations", "Solving Linear Systems", "Calculus"],
@@ -40,15 +43,8 @@ def home_page():
     )
 
     st.markdown('<h1 class="title">Numerical Methods Toolbox</h1>', unsafe_allow_html=True)
-    st.markdown('<h4 class="subtitle">Made by: Daniel, Jhon, Francis, and Mark</h4>', unsafe_allow_html=True)
-
-    Image_logo = Image.open('Logo.png')
-    buffered = BytesIO()
-    Image_logo.save(buffered, format="PNG")
-    img_str = base64.b64encode(buffered.getvalue()).decode()
-    st.markdown(f'<img class="logo" src="data:image/png;base64,{img_str}" alt="Logo">', unsafe_allow_html=True)
-
-    st.markdown('<h4 class="subtitle">Hello! How can we assist you today? Please select an option below.</h4>',
+    st.markdown('<h4 class="subtitle">Made by: Daniel, Jhon, Mark, Francis</h4>', unsafe_allow_html=True)
+    st.markdown('<h4 class="subtitle">Welcome! Select a Method Below:</h4>',
                 unsafe_allow_html=True)
     
     for row_labels, row_files in zip(pages, page_files):
