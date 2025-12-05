@@ -198,5 +198,9 @@ def main():
                             if st.button("Calculate Root"):
                                 root, iterations = daniel_secant.secant(left_bound, right_bound, tolerance, flag, function)
                                 st.write(f"Root: {root}, Iterations: {iterations}")
+    
+    if st.button("Back", use_container_width=True):
+        st.switch_page("app.py")
+        
 main()
 
