@@ -1,11 +1,14 @@
 import streamlit as st
 import os,sys
+
+
 # Add project ROOT so imports work
 ROOT = os.path.dirname(os.path.dirname(__file__))
 if ROOT not in sys.path:
     sys.path.append(ROOT)
     
-from pages.singal_processors import FFT, FWH
+
+from pages.signal_processors import FFT, FWH
 
 # List of pages
 pages = ["Fast Fourier", "Fast Walsh Hadamard"]

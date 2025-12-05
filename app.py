@@ -1,8 +1,4 @@
 import streamlit as st
-#from PIL import Image
-#import base64
-#from io import BytesIO
-
 
 #from pages import about, calculus, home, linear_systems, optimization, root_finding, signal_processing
 
@@ -44,8 +40,7 @@ def home_page():
 
     st.markdown('<h1 class="title">Numerical Methods Toolbox</h1>', unsafe_allow_html=True)
     st.markdown('<h4 class="subtitle">Made by: Daniel, Jhon, Mark, Francis</h4>', unsafe_allow_html=True)
-    st.markdown('<h4 class="subtitle">Welcome! Select a Method Below:</h4>',
-                unsafe_allow_html=True)
+    st.markdown('<h4 class="subtitle">Welcome! Select a Method Below:</h4>', unsafe_allow_html=True)
     
     for row_labels, row_files in zip(pages, page_files):
         cols = st.columns(3)
