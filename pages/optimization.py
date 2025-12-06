@@ -48,6 +48,21 @@ def set_max():
 
 def main():
 
+
+    # remove padding from top of page
+    st.markdown("""
+        <style>
+        .block-container {
+            padding-top: 1rem !important;
+        }
+        </style>
+        """, unsafe_allow_html=True
+                )
+
+
+
+
+
     st.set_page_config(layout="wide")
 
     if "compute_goldenSection" not in st.session_state:
@@ -63,24 +78,36 @@ def main():
 
 
 
-    if st.button("Back"):
-        st.switch_page("app.py")
+    st.divider()
 
-    # set the title with some html for centering and margins
-    st.markdown("<h1 style='text-align:center; margin-bottom:-l0px; margin-top:-30px'>Optimization Methods</h1>",unsafe_allow_html=True)
+    left, center, right = st.columns([1, 3, 1])
 
+
+    with left:
+        with st.container():
+            st.markdown("<div class = 'lower-button'>", unsafe_allow_html = True)
+            if st.button("Back"):
+                st.switch_page("app.py")
+            st.markdown("</div>", unsafe_allow_html = True)
+            
+
+    with center:
+        # set the title with some html for centering and margins
+        st.markdown("<h1 style='text-align:center; margin-bottom:-20px; margin-top:20px'>Optimization Methods</h1>",unsafe_allow_html=True)
+
+    st.divider()
 
 
     # add blank space on left and right
     # center the plots and input
-    left, center_left, center_right, right = st.columns([1, 4, 4, 1])
+    left, center_left, center_right, right = st.columns([1, 5, 4, 1])
 
 
     # right side of page
     # inputs and selections
     with center_right:
 
-        st.markdown("<div style='height:90px'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:100px'></div>", unsafe_allow_html=True)
 
         st.write("## Enter a Function")
 
@@ -174,6 +201,8 @@ def main():
             if "minmax" not in st.session_state:
                     st.session_state["minmax"] = "Minimum"
 
+
+
             with min_col:
                 st.button(
                         "Minimum",
@@ -200,6 +229,8 @@ def main():
             invalid_bound_a = False
             invalid_bound_b = False
 
+
+
             left_bound = float_input("Initial Guess: ", "", key = "left_bound_key")
 
             if contains_log and left_bound != None:
@@ -208,8 +239,6 @@ def main():
                     invalid_bound_b = True
                     st.error("log(x) not defined for x <= 0")
 
-            # check for discontinuity
-            #if function_symbolic != None and left_bound != None:
 
 
 
@@ -302,7 +331,8 @@ def main():
     # plotly plot with interval bounds as text inputs which are converted to floats in order to allow the user to change the bounds of the function
     with center_left:
 
-        st.markdown("<div id='plot-container'>", unsafe_allow_html=True)
+        st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
+
         # plot
         x_points = np.linspace(-10, 10, 500)   # temporary defaults (will be overwritten)
         y_points = np.full_like(x_points, np.nan)
@@ -312,24 +342,24 @@ def main():
 
         plot_placeholder = st.empty()
 
-        left_interval, right_interval = st.columns([1, 1])
+        left_space, left_interval, right_interval, right_space = st.columns([0.01, 2, 2, 1])
 
 
         with left_interval:
             a = float_input("Left Bound", -5.00, key = "left_interval_key")
             if contains_log and a != None:
                 if a <= 0:
-                    st.error("log(x) not defined for x <= 0. Change the bound to plot the function")
+                    st.error("log(x) not defined for x <= 0. Change bound to plot function.")
         with right_interval:
             b = float_input("Right Bound", 5.00, key = "right_interval_key")
             if contains_log and b != None:
                 if b <= 0:
-                    st.error("log(x) not defined for x <= 0. Change the bound to plot the function")
+                    st.error("log(x) not defined for x <= 0. Change bound to plot function.")
 
 
         # recompute the plot using bounds entered by user
         if a != None and b != None:
-            x_points = np.linspace(a, b, 300)
+            x_points = np.linspace(a, b, 500)
             y_points = np.full_like(x_points, np.nan)
 
         if function_text.strip() != "":
@@ -358,16 +388,17 @@ def main():
 
         fig.update_layout(
             width=600,
-            height=600,
+            height=450,
             xaxis=dict(title="x", range=[a, b]),
             yaxis=dict(title="f(x)", range=[y_min, y_max]),
             showlegend=False,
         )
 
+
         # render plotly chart
         plot_placeholder.plotly_chart(fig, use_container_width=False)
 
-        st.markdown("</div>", unsafe_allow_html=True)
+    st.divider()
 
 
 if __name__ == "__main__":
