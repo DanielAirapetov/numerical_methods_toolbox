@@ -93,9 +93,22 @@ def main():
 
     with center:
         # set the title with some html for centering and margins
-        st.markdown("<h1 style='text-align:center; margin-bottom:-20px; margin-top:20px'>Optimization Methods</h1>",unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align:center; margin-bottom:-20px; margin-top:-5px'>Optimization Methods</h1>",unsafe_allow_html=True)
 
-    st.divider()
+
+
+    # this creates a horizontal line and removes the padding from it
+    st.markdown("""
+        <hr class="custom-line">
+        <style>
+        .custom-line {
+            margin-top: 2rem !important;
+            margin-bottom: 0rem !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+    #st.divider()
 
 
     # add blank space on left and right
@@ -107,7 +120,8 @@ def main():
     # inputs and selections
     with center_right:
 
-        st.markdown("<div style='height:100px'></div>", unsafe_allow_html=True)
+        #st.markdown("<div style='height:100px'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:83.5px'></div>", unsafe_allow_html=True)
 
         st.write("## Enter a Function")
 
@@ -331,7 +345,7 @@ def main():
     # plotly plot with interval bounds as text inputs which are converted to floats in order to allow the user to change the bounds of the function
     with center_left:
 
-        st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
+        #st.markdown("<div style='height:100px !important;'></div>", unsafe_allow_html=True)
 
         # plot
         x_points = np.linspace(-10, 10, 500)   # temporary defaults (will be overwritten)
