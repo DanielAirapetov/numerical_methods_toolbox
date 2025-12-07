@@ -1,10 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-
 import plotly.graph_objects as go
-
-import altair as alt
 import sympy as sp
 import os, sys
 
@@ -13,7 +10,10 @@ ROOT = os.path.dirname(os.path.dirname(__file__))
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 
+
+
 from sections.optimization.members import daniel, jhon, mark, francis
+
 
 def safe_eval(func: str, x):
     allowed = {
@@ -26,6 +26,7 @@ def safe_eval(func: str, x):
     }
     return eval(func, {"__builtins__": {}}, allowed)
 
+
 def float_input(label, default, key):
     text = st.text_input(label, value=str(default), key = key)
     try:
@@ -33,10 +34,36 @@ def float_input(label, default, key):
     except ValueError:
         return None
 
+# set_min and set_max are helper functions used to set the session_state of the min and max buttons for the golden section method
+def set_min():
+    st.session_state["minmax"] = "Minimum"
+
+def set_max():
+    st.session_state["minmax"] = "Maximum"
+
+
+
 
 
 
 def main():
+
+
+    # remove padding from top of page
+    st.markdown("""
+        <style>
+        .block-container {
+            padding-top: 1rem !important;
+        }
+        </style>
+        """, unsafe_allow_html=True
+                )
+
+
+
+
+
+    st.set_page_config(layout="wide")
 
     if "compute_goldenSection" not in st.session_state:
         st.session_state["compute_goldenSection"] = False
@@ -46,35 +73,62 @@ def main():
         st.session_state["inputs"] = None
     if "outputs" not in st.session_state:
         st.session_state["outputs"] = None
+    if "minmax" not in st.session_state:
+        st.session_state["minmax"] = "Minimum"
 
 
 
+    st.divider()
 
-    # set page layout to wide
-    st.set_page_config(layout="wide")
-
-    # set the title with some html for centering and margins
-    st.markdown("<h1 style='text-align:center; margin-bottom:10px; margin-top:-30px'>Optimization Methods</h1>",unsafe_allow_html=True)
-
-    # used to safely evaluate an inputed function
+    left, center, right = st.columns([1, 3, 1])
 
 
+    with left:
+        with st.container():
+            st.markdown("<div class = 'lower-button'>", unsafe_allow_html = True)
+            if st.button("Back"):
+                st.switch_page("app.py")
+            st.markdown("</div>", unsafe_allow_html = True)
+            
+
+    with center:
+        # set the title with some html for centering and margins
+        st.markdown("<h1 style='text-align:center; margin-bottom:-20px; margin-top:-5px'>Optimization Methods</h1>",unsafe_allow_html=True)
 
 
 
+    # this creates a horizontal line and removes the padding from it
+    st.markdown("""
+        <hr class="custom-line">
+        <style>
+        .custom-line {
+            margin-top: 2rem !important;
+            margin-bottom: 0rem !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+    #st.divider()
 
 
-    # center the layout
     # add blank space on left and right
     # center the plots and input
-    left, center_left, center_right, right = st.columns([1, 4, 4, 1])
+    left, center_left, center_right, right = st.columns([1, 5, 4, 1])
 
 
     # right side of page
     # inputs and selections
     with center_right:
 
+        #st.markdown("<div style='height:100px'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:83.5px'></div>", unsafe_allow_html=True)
+
         st.write("## Enter a Function")
+
+        # when a new function is entered reset this before checking again
+        discontinuous = False
+        
+
         function_text = st.text_input("f(x) =", value="")
         
         if function_text.strip():
@@ -138,48 +192,85 @@ def main():
 
             input_box1, input_box2 = st.columns(2)
 
+
+            invalid_bound_a = False
+            invalid_bound_b = False
+
             with input_box1:
                 left_bound = float_input("a: ", "", key = "left_bound_key")
+                if contains_log and left_bound != None:
+                    if left_bound <= 0:
+                        invalid_bound_a = True
+                        st.error("a: log(x) not defined for x <= 0")
             with input_box2:
                 right_bound = float_input("b: ", "", key = "right_bound_key")
+                if contains_log and right_bound != None:
+                    if right_bound <= 0:
+                        invalid_bound_b = True
+                        st.error("b: log(x) not defined for x <= 0")
 
-            invalid_bound = False
-            if contains_log:
-                if left_bound != None and left_bound <= 0:
-                    st.error("a: log(x) is undefined for values less than or equal to 0")
-                    invalid_bound = True
-                if right_bound != None and right_bound <= 0:
-                    st.error("b: log(x) is undefined for values less than or equal to 0")
-                    invalid_bound = True
 
-            min_max = st.segmented_control(
-                    "",
-                    options = ["Minimum", "Maximum"],
-                    default = "Minimum"
-            )
-            if min_max == "Minimum":
-                flag = 1
-            else:
-                flag = 2
+            min_col, mid_space, max_col = st.columns([1, 0.001, 1])
+
+            if "minmax" not in st.session_state:
+                    st.session_state["minmax"] = "Minimum"
+
+
+
+            with min_col:
+                st.button(
+                        "Minimum",
+                        on_click = set_min,
+                        type = "primary" if st.session_state["minmax"] == "Minimum" else "secondary",
+                        use_container_width = True
+                        )
+
+            with max_col:
+                st.button(
+                        "Maximum",
+                        on_click = set_max,
+                        type = "primary" if st.session_state["minmax"] == "Maximum" else "secondary",
+                        use_container_width = True
+                        )
+
+            # use it like before
+            min_max = st.session_state["minmax"]
+            flag = 1 if min_max == "Minimum" else 2
+
 
         else:
+
+            invalid_bound_a = False
+            invalid_bound_b = False
+
+
+
             left_bound = float_input("Initial Guess: ", "", key = "left_bound_key")
-            
-            invalid_bound = False
-            if left_bound != None and left_bound <= 0:
-                st.error("log(x) is undefined for values less than or equal to 0")
-                invalid_bound = True
+
+            if contains_log and left_bound != None:
+                if left_bound <= 0:
+                    invalid_bound_a = True
+                    invalid_bound_b = True
+                    st.error("log(x) not defined for x <= 0")
 
 
-        compute_button, computed_result = st.columns([1, 1])
 
+
+        compute_button, mid_space2, computed_result = st.columns([1, 0.001, 1])
         
+
         with compute_button:
 
-            disable_compute = invalid_bound or invalid_delta
-            if st.button("Compute", disabled = invalid_bound or invalid_delta):
-                if function_text.strip() != "" and delta != None:
+            
+            disable_compute =  invalid_bound_a or invalid_bound_b or invalid_delta or discontinuous
+
+
+            if st.button("Compute", disabled = disable_compute, use_container_width = True):
+
+                if function_symbolic != None and function_symbolic != 0 and delta != None:
+
                     if method == "Golden Section" and left_bound != None and right_bound != None:
+
                         st.session_state["compute_goldenSection"] = True
                         st.session_state["compute_newtonMinMax"] = False
                         
@@ -192,7 +283,9 @@ def main():
                                 "member": member,
                                 "func": function_symbolic
                                 }
+
                     elif method == "Newton Min/Max" and left_bound != None:
+
                         st.session_state["compute_goldenSection"] = False
                         st.session_state["compute_newtonMinMax"] = True
 
@@ -249,8 +342,10 @@ def main():
 
 
 
-    # plot with interval bound inputs to increase or decrease the viewing window of the plotted function
+    # plotly plot with interval bounds as text inputs which are converted to floats in order to allow the user to change the bounds of the function
     with center_left:
+
+        #st.markdown("<div style='height:100px !important;'></div>", unsafe_allow_html=True)
 
         # plot
         x_points = np.linspace(-10, 10, 500)   # temporary defaults (will be overwritten)
@@ -261,42 +356,38 @@ def main():
 
         plot_placeholder = st.empty()
 
-        left_interval, right_interval = st.columns([1, 1])
+        left_space, left_interval, right_interval, right_space = st.columns([0.01, 2, 2, 1])
 
 
         with left_interval:
-            a = st.number_input(
-                "Left Bound",
-                value = -5.0,
-                step=0.1,
-                key="left_bound"
-            )
-
-            if contains_log and a <= 0:
-                a = 0.01
-
+            a = float_input("Left Bound", -5.00, key = "left_interval_key")
+            if contains_log and a != None:
+                if a <= 0:
+                    st.error("log(x) not defined for x <= 0. Change bound to plot function.")
         with right_interval:
-            b = st.number_input(
-                "Right Bound",
-                value=5.0,
-                step=0.1,
-                key="right_bound"
-            )
+            b = float_input("Right Bound", 5.00, key = "right_interval_key")
+            if contains_log and b != None:
+                if b <= 0:
+                    st.error("log(x) not defined for x <= 0. Change bound to plot function.")
 
-            if contains_log and b <= 0:
-                b = 0.01
 
         # recompute the plot using bounds entered by user
-        x_points = np.linspace(a, b, 500)
-        y_points = np.full_like(x_points, np.nan)
+        if a != None and b != None:
+            x_points = np.linspace(a, b, 500)
+            y_points = np.full_like(x_points, np.nan)
 
         if function_text.strip() != "":
             try:
                 y_points = safe_eval(function_text, x_points)
+                y_points = np.array(y_points, dtype = float)
+
+                if y_points.ndim == 0:
+                    y_points = np.array([y_points])
             except Exception as e:
                 plot_placeholder.error(f"Error evaluating function: {e}")
 
-        data = pd.DataFrame({"x": x_points, "f(x)": y_points})
+        if len(x_points) == len(y_points):
+            data = pd.DataFrame({"x": x_points, "f(x)": y_points})
 
         # Determine y-range
         if not np.isnan(y_points).all():
@@ -311,17 +402,17 @@ def main():
 
         fig.update_layout(
             width=600,
-            height=600,
+            height=450,
             xaxis=dict(title="x", range=[a, b]),
             yaxis=dict(title="f(x)", range=[y_min, y_max]),
             showlegend=False,
         )
 
-        fig.update_xaxes(showgrid=True, gridwidth=0.5, gridcolor="gray", dtick = 1)
-        fig.update_yaxes(showgrid=True, gridwidth=0.5, gridcolor="gray", dtick = 1)
 
-        # Render Plotly chart
+        # render plotly chart
         plot_placeholder.plotly_chart(fig, use_container_width=False)
+
+    st.divider()
 
 
 if __name__ == "__main__":
