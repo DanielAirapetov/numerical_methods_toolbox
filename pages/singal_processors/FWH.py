@@ -1,5 +1,6 @@
 import streamlit as st
 import os,sys
+from sections.signal_processing.fast_WH import frankie_WH, mark_WH
 # Add project ROOT so imports work
 ROOT = os.path.dirname(os.path.dirname(__file__))
 if ROOT not in sys.path:
@@ -11,3 +12,5 @@ st.set_page_config(
 )
 def main():
     st.title("Fast Walsh Hadamard Transformer")
+    
+    

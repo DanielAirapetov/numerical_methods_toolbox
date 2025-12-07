@@ -5,15 +5,15 @@ ROOT = os.path.dirname(os.path.dirname(__file__))
 if ROOT not in sys.path:
     sys.path.append(ROOT)
     
-from pages.singal_processors import FFT, FWH
+from pages.singal_processors import Audio, Image
 
 # List of pages
-pages = ["Fast Fourier", "Fast Walsh Hadamard"]
+pages = ["Audio FFT/WHT", "Image FFT/WHT"]
 
 # Map page names to their functions (do NOT call them)
 page_functions = {
-    "Fast Fourier": FFT.main,
-    "Fast Walsh Hadamard": FWH.main
+    "Audio FFT/WHT": Audio.main,
+    "Image FFT/WHT": Image.main
 }
 
 # Store the current page in session_state
