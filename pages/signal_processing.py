@@ -7,7 +7,8 @@ ROOT = os.path.dirname(os.path.dirname(__file__))
 if ROOT not in sys.path:
     sys.path.append(ROOT)
     
-from pages.singal_processors import Audio, Image
+import signal_processors.Audio as Audio
+import signal_processors.Image as Image
 
 # List of pages
 pages = ["Audio FFT/WHT", "Image FFT/WHT"]
