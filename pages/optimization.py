@@ -49,6 +49,12 @@ def set_max():
 def main():
 
 
+    # sets page to wide
+    st.set_page_config(layout="wide")
+    st.set_page_config(page_title = "Non-linear Optimization")
+    st.set_page_config(initial_sidebar_state = "collapsed")
+
+
     # remove padding from top of page
     st.markdown("""
         <style>
@@ -62,9 +68,6 @@ def main():
 
 
 
-
-    st.set_page_config(layout="wide")
-
     if "compute_goldenSection" not in st.session_state:
         st.session_state["compute_goldenSection"] = False
     if "compute_newtonMinMax" not in st.session_state:
@@ -77,8 +80,9 @@ def main():
         st.session_state["minmax"] = "Minimum"
 
 
-
+    # this is essentially the streamlit version of a horizontal line in html
     st.divider()
+
 
     left, center, right = st.columns([1, 3, 1])
 
@@ -93,7 +97,7 @@ def main():
 
     with center:
         # set the title with some html for centering and margins
-        st.markdown("<h1 style='text-align:center; margin-bottom:-20px; margin-top:-5px'>Optimization Methods</h1>",unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align:center; margin-bottom:-20px; margin-top:-8px'>Non-linear Optimization</h1>",unsafe_allow_html=True)
 
 
 
@@ -108,20 +112,18 @@ def main():
         </style>
         """, unsafe_allow_html=True)
 
-    #st.divider()
-
+    st.markdown("<br>", unsafe_allow_html = True)
 
     # add blank space on left and right
     # center the plots and input
-    left, center_left, center_right, right = st.columns([1, 5, 4, 1])
+    left, center_left, center_right, right = st.columns([0.8, 5, 4, 1])
 
 
     # right side of page
     # inputs and selections
     with center_right:
 
-        #st.markdown("<div style='height:100px'></div>", unsafe_allow_html=True)
-        st.markdown("<div style='height:83.5px'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:40px'></div>", unsafe_allow_html=True)
 
         st.write("## Enter a Function")
 
@@ -240,6 +242,7 @@ def main():
 
         else:
 
+            st.markdown("<br>", unsafe_allow_html = True)
             invalid_bound_a = False
             invalid_bound_b = False
 
@@ -256,6 +259,7 @@ def main():
 
 
 
+
         compute_button, mid_space2, computed_result = st.columns([1, 0.001, 1])
         
 
@@ -263,7 +267,6 @@ def main():
 
             
             disable_compute =  invalid_bound_a or invalid_bound_b or invalid_delta or discontinuous
-
 
             if st.button("Compute", disabled = disable_compute, use_container_width = True):
 
@@ -345,7 +348,7 @@ def main():
     # plotly plot with interval bounds as text inputs which are converted to floats in order to allow the user to change the bounds of the function
     with center_left:
 
-        #st.markdown("<div style='height:100px !important;'></div>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html = True)
 
         # plot
         x_points = np.linspace(-10, 10, 500)   # temporary defaults (will be overwritten)
@@ -412,6 +415,7 @@ def main():
         # render plotly chart
         plot_placeholder.plotly_chart(fig, use_container_width=False)
 
+    st.markdown("<br>", unsafe_allow_html = True)
     st.divider()
 
 
