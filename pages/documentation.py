@@ -57,7 +57,7 @@ def main():
 
 
     
-    st.markdown("<br><h2 style = 'text-align:center'>Non-linear Equations</h2>", unsafe_allow_html = True)
+    st.markdown("<br><br><h2 style = 'text-align:center'>Non-linear Equations</h2>", unsafe_allow_html = True)
 
 
     left, mid, right = st.columns([1, 0.05, 1])
@@ -73,7 +73,7 @@ def main():
 
 
 
-    st.markdown("<br><h2 style = 'text-align:center'>Linear Systems</h2>", unsafe_allow_html = True)
+    st.markdown("<br><br><h2 style = 'text-align:center'>Linear Systems</h2>", unsafe_allow_html = True)
 
 
     left, mid, right = st.columns([1, 0.05, 1])
@@ -88,7 +88,7 @@ def main():
 
 
 
-    st.markdown("<br><h2 style = 'text-align:center'>Calculus</h2>", unsafe_allow_html = True)
+    st.markdown("<br><br><h2 style = 'text-align:center'>Calculus</h2>", unsafe_allow_html = True)
 
 
     left, mid, right = st.columns([1, 0.05, 1])
@@ -104,7 +104,7 @@ def main():
  
 
 
-    st.markdown("<br><h2 style = 'text-align:center'>Non-linear Optimization</h2>", unsafe_allow_html = True)
+    st.markdown("<br><br><h2 style = 'text-align:center'>Non-linear Optimization</h2>", unsafe_allow_html = True)
 
 
     left, mid, right = st.columns([1, 0.05, 1])
@@ -120,7 +120,7 @@ def main():
 
 
 
-    st.markdown("<br><h2 style = 'text-align:center'>Signal Processing</h2>", unsafe_allow_html = True)
+    st.markdown("<br><br><h2 style = 'text-align:center'>Signal Processing</h2>", unsafe_allow_html = True)
 
 
     left, mid, right = st.columns([1, 0.05, 1])
