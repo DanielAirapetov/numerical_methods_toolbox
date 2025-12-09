@@ -8,6 +8,7 @@ import os, sys
 st.set_page_config(
     page_title="Solving Nonlinear Equations",
     initial_sidebar_state="collapsed" 
+    layout = "centered"
 )
 
 ROOT = os.path.dirname(os.path.dirname(__file__))
