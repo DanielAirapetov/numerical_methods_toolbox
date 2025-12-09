@@ -6,8 +6,8 @@ import plotly.express as px
 import os, sys
 
 st.set_page_config(
-    page_title="Solving Nonlinear Equations",
-    initial_sidebar_state="collapsed" 
+    page_title = "Solving Nonlinear Equations",
+    initial_sidebar_state = "collapsed", 
     layout = "centered"
 )
 
