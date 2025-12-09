@@ -35,6 +35,7 @@ from sections.root_finding.newton import daniel_newton
 from sections.root_finding.newton import franky_newton
 
 def main():
+ 
     st.markdown(
         """
         <style>
@@ -54,8 +55,10 @@ def main():
         unsafe_allow_html=True
     )
     
+
     st.markdown('<h1 class="title">Solving Nonlinear Equations</h1>', unsafe_allow_html=True)
-    
+ 
+  
     equation = None
     equation = st.text_input("Enter the equation you want to solve: ")
     
@@ -198,9 +201,9 @@ def main():
                             if st.button("Calculate Root"):
                                 root, iterations = daniel_secant.secant(left_bound, right_bound, tolerance, flag, function)
                                 st.write(f"Root: {root}, Iterations: {iterations}")
-    
     if st.button("Back", use_container_width=True):
         st.switch_page("app.py")
-        
+    
+       
 main()
 
