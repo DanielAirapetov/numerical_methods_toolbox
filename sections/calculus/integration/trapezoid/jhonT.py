@@ -12,7 +12,7 @@ def lagrange_function(z, x, f):
     
     return interpolated_value
 
-def trapezoidal_rule(h, x, f):
+def trapezoidal_rule(x, f, h):
     sum = 0
     data_point = round(x[0] + 0.1, 1)
     n = int((x[len(x) - 1] - x[0]) / h)

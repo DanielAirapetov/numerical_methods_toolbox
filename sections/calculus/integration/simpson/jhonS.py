@@ -12,7 +12,8 @@ def lagrange_function(z, x, f):
     
     return interpolated_value
 
-def simpson_rule(h, x, f, n):
+def simpson_rule(x, f, h):
+    n = len(x) - 1
     sum_01 = 0
     max_01 = round((((n / 2) / 10) + 1.0) - 0.1, 1) 
       

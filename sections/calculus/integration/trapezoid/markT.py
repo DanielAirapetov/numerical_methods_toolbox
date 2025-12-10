@@ -12,7 +12,7 @@ def lagrangeInterpolation(z, x, f, m) :
     points = np.argpartition(np.abs(x - z), m)[:m]
     
     # the variable is used to store the result
-    interpolated_value = 0;
+    interpolated_value = 0
 
 
     # step through the array of indices
