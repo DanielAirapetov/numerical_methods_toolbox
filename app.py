@@ -25,10 +25,9 @@ def main():
 
     left, center, right = st.columns([1, 3, 1])
 
+
     # button for going to documentation page
     # i used streamlit columns to make the button sit on the right hand side of the title
-
-
     with right:
         st.markdown("<br>", unsafe_allow_html = True)
         if st.button("Documentation"):
@@ -37,7 +36,9 @@ def main():
     with center:
         # this writes the title and names of authors with some html for centering and margins
         st.markdown("<h1 style='text-align:center; margin-bottom:-20px;'>Numerical Methods Toolbox</h1>",unsafe_allow_html=True)
-        st.markdown("<h3 style='text-align:center;'>Made by: Daniel Airepetov, Jhon Palaguachi, Mark Pepaj, Francis Scullin</h3>", unsafe_allow_html = True)
+        l, m, r = st.columns([1, 3, 1])
+        with m:
+            st.markdown("<br><h3 style='text-align:center;'>Daniel Airepetov, Jhon Palaguachi, Mark Pepaj, Francis Scullin</h3>", unsafe_allow_html = True)
 
 
 
@@ -47,7 +48,7 @@ def main():
         <hr class="custom-line">
         <style>
         .custom-line {
-            margin-top: 2rem !important;
+            margin-top: 0rem !important;
             margin-bottom: 0rem !important;
         }
         </style>
