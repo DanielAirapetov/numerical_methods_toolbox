@@ -19,10 +19,15 @@ def safe_eval(func: str, x):
     allowed = {
         "x": x,
         "np": np,
-        "sin": np.sin, "cos": np.cos, "tan": np.tan,
-        "exp": np.exp, "log": np.log,
-        "sqrt": np.sqrt, "abs": np.abs,
-        "pi": np.pi, "e": np.e
+        "sin": np.sin,
+        "cos": np.cos,
+        "tan": np.tan,
+        "exp": np.exp,
+        "log": np.log,
+        "sqrt": np.sqrt,
+        "abs": np.abs,
+        "pi": np.pi,
+        "e": np.e
     }
     return eval(func, {"__builtins__": {}}, allowed)
 
@@ -40,8 +45,6 @@ def set_min():
 
 def set_max():
     st.session_state["minmax"] = "Maximum"
-
-
 
 
 
@@ -89,7 +92,7 @@ def main():
 
     with left:
         with st.container():
-            st.markdown("<div class = 'lower-button'>", unsafe_allow_html = True)
+            st.markdown("<div style = 'margin-top: -20px; margin-bottom:50px;'>", unsafe_allow_html = True)
             if st.button("Back"):
                 st.switch_page("app.py")
             st.markdown("</div>", unsafe_allow_html = True)
@@ -97,7 +100,7 @@ def main():
 
     with center:
         # set the title with some html for centering and margins
-        st.markdown("<h1 style='text-align:center; margin-bottom:-20px; margin-top:-8px'>Non-linear Optimization</h1>",unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align:center; margin-bottom:-50px; margin-top:3px'>Non-linear Optimization</h1>",unsafe_allow_html=True)
 
 
 
@@ -112,7 +115,7 @@ def main():
         </style>
         """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html = True)
+    #st.markdown("<br>", unsafe_allow_html = True)
 
     # add blank space on left and right
     # center the plots and input
@@ -132,27 +135,29 @@ def main():
         
 
         function_text = st.text_input("f(x) =", value="")
-        
+
         if function_text.strip():
 
-                try:
+            function_text = function_text.replace("^", "**")
 
-                    function_symbolic = sp.sympify(function_text, locals = {
-                        "sin": sp.sin,
-                        "cos": sp.cos,
-                        "tan": sp.tan,
-                        "log": sp.log,
-                        "exp": sp.exp,
-                        "sqrt": sp.sqrt,
-                        "pi": sp.pi,
-                        "e": sp.E,
-                        })
+            try:
 
-                except Exception as e:
+                function_symbolic = sp.sympify(function_text, locals = {
+                    "sin": sp.sin,
+                    "cos": sp.cos,
+                    "tan": sp.tan,
+                    "log": sp.log,
+                    "exp": sp.exp,
+                    "sqrt": sp.sqrt,
+                    "pi": sp.pi,
+                    "e": sp.E
+                    })
 
-                    function_symbolic = None
+            except Exception as e:
 
-                    st.error(f"Error parsing function: {e}")
+                function_symbolic = None
+
+                st.error(f"Error parsing function: {e}")
         else:
             function_symbolic = None
 
@@ -348,7 +353,7 @@ def main():
     # plotly plot with interval bounds as text inputs which are converted to floats in order to allow the user to change the bounds of the function
     with center_left:
 
-        st.markdown("<br>", unsafe_allow_html = True)
+        #st.markdown("<br>", unsafe_allow_html = True)
 
         # plot
         x_points = np.linspace(-10, 10, 500)   # temporary defaults (will be overwritten)
@@ -415,9 +420,11 @@ def main():
         # render plotly chart
         plot_placeholder.plotly_chart(fig, use_container_width=False)
 
-    st.markdown("<br>", unsafe_allow_html = True)
-    st.divider()
 
+    
+    st.markdown("<br><div style = 'margin-top: 35px;'>", unsafe_allow_html = True)
+    st.divider()
+    st.markdown("</div>", unsafe_allow_html = True)
 
 if __name__ == "__main__":
     main()
