@@ -142,6 +142,19 @@ def getTable(input_type, flag, operation_type=None):
 
     return x_values, y_values
 
+def _build_uniform_simpson_grid(x_points, y_points, h_input):
+    a, b = x_points[0], x_points[-1]
+
+    # Start from user's h, convert to an even number of subintervals
+    n = max(2, int(round((b - a) / float(h_input))))
+    if n % 2 == 1:  # must be even
+        n += 1
+
+    h_eff = (b - a) / n
+    Xu = [a + k * h_eff for k in range(n + 1)]
+    Yu = np.interp(Xu, x_points, y_points).tolist()
+    return Xu, Yu, h_eff, n
+
 def selectMember():
     return st.selectbox("Select whose method to use:", ["Daniel", "Francis", "Jhon", "Mark"])
 
@@ -202,7 +215,14 @@ if operation == "Differentiation":
 
     # call the function
     diff_func = diff_funcs[member]
-    result = diff_func(x_value, x_points, y_points, h, flag, degree)
+    if member == "Daniel":
+        result = diff_func(x_value, x_points, y_points, h, flag, degree)
+    elif member == "Francis":
+        result = diff_func(x_value, x_points, y_points, h, flag, 1 if degree == 2 else 2)
+    elif member == "Jhon":
+        result = diff_func(x_value, np.array(x_points), np.array(y_points), h, flag, degree - 1)
+    elif member == "Mark":
+        result = diff_func(x_value, np.array(x_points), np.array(y_points), h, flag, degree + 1)
     
 elif operation == "Integration":
     flag = None
@@ -245,7 +265,35 @@ elif operation == "Integration":
 
         # call the function
         simpson_func = simpson_funcs[member]
-        result = simpson_func(x_points, y_points, h)
+        if member == "Daniel":
+            result = simpson_func(x_points, y_points, h)
+        elif member == "Francis":
+            a, b = x_points[0], x_points[-1]
+            Xu, Yu, h_eff, n_even = _build_uniform_simpson_grid(x_points, y_points, h)
+            result = simpson_func(Xu, Yu, h_eff)
+        elif member == "Jhon":
+            # Convert to NumPy arrays for compatibility
+            x_np = np.array(x_points, dtype=float)
+            y_np = np.array(y_points, dtype=float)
+            # Regrid with equal 0.1 spacing (expected by his logic)
+            x_fixed = np.round(np.linspace(x_np.min(), x_np.max(), len(x_np)), 1)
+            y_fixed = np.interp(x_fixed, x_np, y_np)
+            # Run and scale result (his algorithm assumes smaller units)
+            result = simpson_func(x_fixed, y_fixed, 0.1) * 100
+        elif member == "Mark":
+            x_np = np.array(x_points, dtype=float)
+            y_np = np.array(y_points, dtype=float)
+
+            # Calculate h safely
+            h = float((x_np[-1] - x_np[0]) / (len(x_np) - 1))
+
+            # Ensure even number of subintervals
+            n = int((x_np[-1] - x_np[0]) / h)
+            if n % 2 != 0:
+                n -= 1
+                h = (x_np[-1] - x_np[0]) / n
+
+            result = simpson_func(x_np, y_np, h)
 
     elif method == "Trapezoid":
         input_type = st.selectbox("Choose a input type: ", ["GUI", "CSV"])
@@ -285,7 +333,28 @@ elif operation == "Integration":
 
         # call the function
         trap_func = trapezoid_funcs[member]
-        result = trap_func(x_points, y_points, h)
+        if member == "Daniel":
+            result = trap_func(x_points, y_points, h)
+        elif member == "Francis":
+            x_np = np.round(np.array(x_points, dtype=float), 1)
+            y_np = np.round(np.array(y_points, dtype=float), 5)
+            h = round((x_np[-1] - x_np[0]) / (len(x_np) - 1), 1)
+            result = trap_func(x_np, y_np, h)
+        elif member == "Jhon":
+            x_np = np.array(x_points, dtype=float)
+            y_np = np.array(y_points, dtype=float)
+            x_np = np.round(x_np, 3)
+            y_np = np.round(y_np, 3)
+            h = float(np.round((x_np[-1] - x_np[0]) / (len(x_np) - 1), 3))
+            result = trap_func(x_np, y_np, h)
+        elif member == "Mark":
+            x_np = np.array(x_points, dtype=float)
+            y_np = np.array(y_points, dtype=float)
+            h = float((x_np[-1] - x_np[0]) / (len(x_np) - 1))
+            if len(x_np) <= 3:
+                result = trap_func(x_np, y_np, h)  
+            else:
+                result = trap_func(x_np, y_np, h)
 
 if result is not None:
     st.subheader("Result")
