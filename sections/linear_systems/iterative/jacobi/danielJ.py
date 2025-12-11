@@ -40,7 +40,7 @@ def jacobi_iterative_method(mat, tol, flag):
     a = [row[:] for row in mat]
     n = len(a)
     biases = [row[-1] for row in a]
-    new_x = [1 for row in a]
+    new_x = [0.0 for _ in range(n)]
     old_x = new_x.copy()
 
     for i in range(n):
@@ -50,6 +50,7 @@ def jacobi_iterative_method(mat, tol, flag):
         for j in range(n):
             if i != j:
                 a[i][j] = a[i][j] / a[i][i]
+        a[i][i] = 0
 
     iter = 0
     error = tol + 1
@@ -58,48 +59,31 @@ def jacobi_iterative_method(mat, tol, flag):
         old_x = new_x.copy()
         for i in range(n):
             new_x[i] = biases[i]
-        
+        for j in range(n):
+            for k in range(n):
+                if j != k:
+                    new_x[j] -= a[j][k] * old_x[k]
         if flag == 1:
-                for j in range(n):
-                    for k in range(n):
-                        if j != k:
-                            new_x[j] -= a[j][k] * old_x[k]
-                    error += abs(new_x[j] - old_x[j])
-                error /= n
+            error = sum(abs(new_x[j] - old_x[j]) for j in range(n)) / n
 
         elif flag == 2:
-                for j in range(n):
-                    for k in range(n):
-                        if j != k:
-                            new_x[j] -= a[j][k] * old_x[k]
-                    error += (new_x[j] - old_x[j]) ** 2
-                error = (error / n) ** 0.5 
+            error = (sum((new_x[j] - old_x[j]) ** 2 for j in range(n)) / n) ** 0.5 
 
         elif flag == 3:
-                for j in range(n):
-                    for k in range(n):
-                        if j != k:
-                            new_x[j] -= a[j][k] * old_x[k]
-                for i in range(n):
-                    summation = 0
-                    for j in range(n):
-                        summation += a[i][j] * new_x[j]
-                    error += abs(summation - biases[i])
-                error /= n
+            for i in range(n):
+                summation = new_x[i] + sum(a[i][j] * new_x[j] for j in range(n)) 
+                error += abs(summation - biases[i])
+            error /= n
 
         elif flag == 4:
-                for j in range(n):
-                    for k in range(n):
-                        if j != k:
-                            new_x[j] -= a[j][k] * old_x[k]
-                for i in range(n):
-                    summation = 0
-                    for j in range(n):
-                        summation += a[i][j] * new_x[j]
-                    error += (summation - biases[i]) ** 2
-                error = (error / n) ** 0.5
+            for i in range(n):
+                summation = new_x[i] + sum(a[i][j] * new_x[j] for j in range(n))
+                error += (summation - biases[i]) ** 2
+            error = (error / n) ** 0.5
+
         else:
-            print("ERROR: Invalid Flag")
+            print("Error: Invalid flag")
+            
         iter += 1
         if (iter > 1000): # check if iterations has exceeded a "ridiculous" value (1000)
             print("\nIterations have exceeded 1000, terminating the Jacobi function.") 

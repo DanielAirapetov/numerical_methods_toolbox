@@ -40,46 +40,37 @@ def gauss_seidel_iterative_method(mat, tol, flag):
     a = [row[:] for row in mat]
     n = len(a)
     biases = [row[-1] for row in a]
-    new_x = [1 for row in a]
+    new_x = [0.0 for _ in range(n)]
     old_x = new_x.copy()
 
     for i in range(n):
         if a[i][i] == 0:
-            raise ZeroDivisionError("Zero diagonal element encountered — cannot perform iteration.")
-        biases[i] = biases[i] / a[i][i]
-        for j in range(n):
-            if i != j:
-                a[i][j] = a[i][j] / a[i][i]
+            raise ZeroDivisionError("Zero diagonal element encountered, cannot perform iteration.")
 
     iter = 0
     error = tol + 1
     while error > tol:
         error = 0
         old_x = new_x.copy()
-        for i in range(n):
-            new_x[i] = biases[i]
+        for j in range(n):
+            sum_ = 0
+            for k in range(n):
+                if k != j:
+                    sum_ += a[j][k] * new_x[k]
+            new_val = (biases[j] - sum_) / a[j][j]  
+            new_x[j] = new_val  
         
         if flag == 1:
                 for j in range(n):
-                    for k in range(n):
-                        if j != k:
-                            new_x[j] -= a[j][k] * new_x[k]
                     error += abs(new_x[j] - old_x[j])
                 error /= n
 
         elif flag == 2:
                 for j in range(n):
-                    for k in range(n):
-                        if j != k:
-                            new_x[j] -= a[j][k] * new_x[k]
                     error += (new_x[j] - old_x[j]) ** 2
-                error = (error / n) ** 0.5 
+                error = (error / n) ** 0.5  
 
         elif flag == 3:
-                for j in range(n):
-                    for k in range(n):
-                        if j != k:
-                            new_x[j] -= a[j][k] * new_x[k]
                 for i in range(n):
                     summation = 0
                     for j in range(n):
@@ -88,18 +79,16 @@ def gauss_seidel_iterative_method(mat, tol, flag):
                 error /= n
 
         elif flag == 4:
-                for j in range(n):
-                    for k in range(n):
-                        if j != k:
-                            new_x[j] -= a[j][k] * new_x[k]
                 for i in range(n):
                     summation = 0
                     for j in range(n):
                         summation += a[i][j] * new_x[j]
                     error += (summation - biases[i]) ** 2
                 error = (error / n) ** 0.5
+
         else:
-            print("Error: invalid flag")
+            print("Error: Invalid flag")
+            
         iter += 1
         if (iter > 1000): # check if iterations has exceeded a "ridiculous" value (1000)
             print("\nIterations have exceeded 1000, terminating the Gauss-Seidel function.") 
