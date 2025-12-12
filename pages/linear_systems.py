@@ -77,7 +77,7 @@ def getMatrix(input_type):
             return None
         df = pd.read_csv(uploaded, header=None)
         csv_mat = df.to_numpy(dtype=float)
-        if csv_mat.shape[1] != csv_mat.shape[0]:
+        if csv_mat.shape[1] != csv_mat.shape[0] + 1:
             st.error("Must be nxn augmented matrix (make sure you have one more column than rows)")
         return csv_mat      
 
