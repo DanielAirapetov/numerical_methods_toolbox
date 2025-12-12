@@ -369,8 +369,7 @@ elif operation == "Integration":
             y_np = np.array(y_sorted, dtype=float)
             x_np = np.round(x_np, 3)
             y_np = np.round(y_np, 3)
-            h = float(np.round((x_np[-1] - x_np[0]) / (len(x_np) - 1), 3))
-            result = trap_func(x_np, y_np, h)
+            result = trap_func(x_np, y_np, 0.1)
         elif member == "Mark":
             x_np = np.array(x_sorted, dtype=float)
             y_np = np.array(y_sorted, dtype=float)
