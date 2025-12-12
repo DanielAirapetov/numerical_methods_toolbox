@@ -50,6 +50,7 @@ def main():
 
 
 
+    # html link that navigates to documentation page
     st.markdown(
             """
             <div style = 'text-align: center; margin-top:30px; margin-bottom:-10px;'>
@@ -60,12 +61,14 @@ def main():
             """, unsafe_allow_html=True)
 
 
+    
     st.markdown("<h4 style='text-align:center; margin-top:20px'>Welcome! Please select a method below:</h4>", unsafe_allow_html = True)
 
-        
-    # this creates a horizontal line and removes the padding from it
+    # link break using html
     st.markdown("<br>", unsafe_allow_html = True)
 
+
+    # the following lines first define some styling for the streamlit buttons and then create the buttons with functionality for navigating to different pages
     with st.container():
 
         st.markdown("""
