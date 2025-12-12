@@ -294,7 +294,7 @@ elif operation == "Integration":
             x_fixed = np.round(np.linspace(x_np.min(), x_np.max(), len(x_np)), 1)
             y_fixed = np.interp(x_fixed, x_np, y_np)
             # Run and scale result (his algorithm assumes smaller units)
-            result = simpson_func(x_fixed, y_fixed, 0.1) * 100
+            result = simpson_func(x_fixed, y_fixed, 0.1)
         elif member == "Mark":
             x_np = np.array(x_sorted, dtype=float)
             y_np = np.array(y_sorted, dtype=float)
