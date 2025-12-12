@@ -76,35 +76,26 @@ def main():
         </style>
         """, unsafe_allow_html = True)
 
-        left_col, mid_col, right_col = st.columns([1, 3, 1])
+        left, mid_left, mid, mid_right, right = st.columns([1, 1, 0.05, 1, 1])
 
-        with mid_col:
+        with mid_left:
 
-
-            left_col1, mid_col1, right_col1 = st.columns([1, 1, 1])
-
-            with left_col1:
-                if st.button("Non-linear Equations", use_container_width = True):
-                    st.switch_page("pages/non_linear_equations.py")
-            with mid_col1:
-                if st.button("Linear Systems", use_container_width = True):
-                    st.switch_page("pages/linear_systems.py")
-            with right_col1:
-                if st.button("Calculus", use_container_width = True):
-                    st.switch_page("pages/calculus.py")
-
+            if st.button("Non-linear Equations", use_container_width = True):
+                st.switch_page("pages/non_linear_equations.py")
 
             st.markdown("<br>", unsafe_allow_html = True)
 
+            if st.button("Calculus", use_container_width = True):
+                st.switch_page("pages/calculus.py")
 
-            left_space, left_col2, mid_col2, right_col2, right_space = st.columns([1, 2, 0.01, 2, 1])
+        with mid_right:
+            if st.button("Linear Systems", use_container_width = True):
+                st.switch_page("pages/linear_systems.py")
 
-            with left_col2:
-                if st.button("Non-linear Optimization", use_container_width = True):
-                    st.switch_page("pages/non_linear_optimization.py")
-            with right_col2:
-                if st.button("Signal Processing", use_container_width = True):
-                    st.switch_page("pages/signal_processing.py")
+            st.markdown("<br>", unsafe_allow_html = True)
+
+            if st.button("Non-linear Optimization", use_container_width = True):
+                st.switch_page("pages/non_linear_optimization.py")
 
 
     st.markdown("<br><br>", unsafe_allow_html = True)
