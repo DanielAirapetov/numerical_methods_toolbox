@@ -4,11 +4,12 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 # Back Button 
 col_back, _ = st.columns([1, 5])
 with col_back:
-    if st.button("⬅️ Back"):
+    if st.button("Back"):
         st.switch_page("app.py")
 
 # Add project ROOT so imports work
@@ -16,7 +17,7 @@ ROOT = os.path.dirname(os.path.dirname(__file__))
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 
-# ---- Differentiation ----
+# Differentiation
 from sections.calculus.differentiation.danielD import numerical_differentiation
 from sections.calculus.differentiation.frankyD import num_diff
 from sections.calculus.differentiation.markD import differentiate
@@ -29,7 +30,7 @@ diff_funcs = {
     "Mark": differentiate
 }
 
-# ---- Simpson Integration ----
+# Simpson Integration
 from sections.calculus.integration.simpson.danielS import simpsonsRule_integration
 from sections.calculus.integration.simpson.frankyS import simpsons_rule
 from sections.calculus.integration.simpson.markS import simpsonOneThirdMethod
@@ -42,7 +43,7 @@ simpson_funcs = {
     "Mark": simpsonOneThirdMethod
 }
 
-# ---- Trapezoid Integration ----
+# Trapezoid Integration
 from sections.calculus.integration.trapezoid.danielT import trapezoidRule_integration
 from sections.calculus.integration.trapezoid.frankyT import trapezoidal_rule
 from sections.calculus.integration.trapezoid.markT import newtonCotesTrapezoidalRuleMethod
@@ -56,13 +57,13 @@ trapezoid_funcs = {
 }
 
 def createTable(operation, flag):
-    # --- Determine minimum rows based on operation/flag ---
+    # Determine minimum rows based on operation/flag
     if operation == "Trapezoid" or flag == "a":   # "a" == 2-point forward
         min_rows = 2
     else:
         min_rows = 3
 
-    # --- Initialize row count in session state ---
+    # Initialize row count in session state
     if "table_rows" not in st.session_state:
         st.session_state.table_rows = min_rows
 
@@ -88,12 +89,12 @@ def createTable(operation, flag):
         hide_index=True,
         use_container_width=True,
         column_config={
-            "x": st.column_config.NumberColumn("x", step=0.1, format="%.3f"),
-            "f(x)": st.column_config.NumberColumn("f(x)", step=0.1, format="%.3f"),
+            "x": st.column_config.NumberColumn("x", step=1e-6, format="%.6f"),
+            "f(x)": st.column_config.NumberColumn("f(x)", step=1e-6, format="%.6f"),
         }
     )
 
-    # ---- Row control BELOW the table ----
+    # Row control BELOW the table
     col1, _ = st.columns(2)
     with col1:
         new_rows = st.number_input(
@@ -177,8 +178,8 @@ if operation == "Differentiation":
     flag = flag_map[flag_label]
     input_type = st.selectbox("Choose a input type: ", ["GUI", "CSV"])
     x_points, y_points = getTable(input_type, flag)
-    x_value = st.number_input("Enter the x value to evaluate the derivative at: ", step=1.0)
-    h = st.number_input("Enter the step size:", value=0.1, step=0.1)
+    x_value = st.number_input("Enter the x value to evaluate the derivative at:", step=1e-6, format="%.6f")
+    h = st.number_input("Enter the step size:", value=0.1, step=1e-6, format="%.6f")
     degree = int(st.selectbox("Choose an interpolation degree: ", [2, 3]))
     member = selectMember()
 
@@ -366,6 +367,10 @@ if result is not None:
     # 2) Controls BELOW the graph
     st.subheader("Graph Window Settings")
     default_xmin, default_xmax = float(min(x_points)), float(max(x_points))
+    x_range = default_xmax - default_xmin if default_xmax != default_xmin else 1
+    default_xmin -= 0.05 * x_range
+    default_xmax += 0.05 * x_range
+
     default_ymin, default_ymax = float(min(y_points)), float(max(y_points))
     y_range = default_ymax - default_ymin if default_ymax != default_ymin else 1
     default_ymin -= 0.1 * y_range
@@ -392,7 +397,7 @@ if result is not None:
     # Scatter the original data points
     ax.scatter(x_points, y_points, label="Data Points")
 
-    # ----- DIFFERENTIATION -----
+    # Differentiation
     if operation == "Differentiation":
         # Smooth function curve
         x_dense = np.linspace(min(x_points), max(x_points), 800)
@@ -436,7 +441,7 @@ if result is not None:
         ax.set_title("Derivative Visualization", fontsize=13, weight="bold")
         ax.grid(True, linestyle="--", alpha=0.6)
 
-    # ----- INTEGRATION -----
+    # Integration
     elif operation == "Integration":
         # Smooth function curve for cleaner visualization
         x_dense = np.linspace(min(x_points), max(x_points), 800)
