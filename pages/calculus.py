@@ -4,13 +4,20 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import math
+
+# Back Button 
+col_back, _ = st.columns([1, 5])
+with col_back:
+    if st.button("Back"):
+        st.switch_page("app.py")
 
 # Add project ROOT so imports work
 ROOT = os.path.dirname(os.path.dirname(__file__))
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 
-# ---- Differentiation ----
+# Differentiation
 from sections.calculus.differentiation.danielD import numerical_differentiation
 from sections.calculus.differentiation.frankyD import num_diff
 from sections.calculus.differentiation.markD import differentiate
@@ -23,7 +30,7 @@ diff_funcs = {
     "Mark": differentiate
 }
 
-# ---- Simpson Integration ----
+# Simpson Integration
 from sections.calculus.integration.simpson.danielS import simpsonsRule_integration
 from sections.calculus.integration.simpson.frankyS import simpsons_rule
 from sections.calculus.integration.simpson.markS import simpsonOneThirdMethod
@@ -36,7 +43,7 @@ simpson_funcs = {
     "Mark": simpsonOneThirdMethod
 }
 
-# ---- Trapezoid Integration ----
+# Trapezoid Integration
 from sections.calculus.integration.trapezoid.danielT import trapezoidRule_integration
 from sections.calculus.integration.trapezoid.frankyT import trapezoidal_rule
 from sections.calculus.integration.trapezoid.markT import newtonCotesTrapezoidalRuleMethod
@@ -50,75 +57,72 @@ trapezoid_funcs = {
 }
 
 def createTable(operation, flag):
-    # --- Determine minimum rows ---
-    if "min_rows" not in st.session_state:
-        if operation == "Trapezoid" or flag == "2-point forward difference":
-            st.session_state.min_rows = 2
-        else:
-            st.session_state.min_rows = 3
+    # Determine minimum rows based on operation/flag
+    if operation == "Trapezoid" or flag == "a":   # "a" == 2-point forward
+        min_rows = 2
+    else:
+        min_rows = 3
 
-    # --- Initialize persistent table once ---
-    if "table_data" not in st.session_state:
-        st.session_state.table_data = pd.DataFrame({
-            "x": [0.0] * st.session_state.min_rows,
-            "f(x)": [0.0] * st.session_state.min_rows
-        })
+    # Initialize row count in session state
+    if "table_rows" not in st.session_state:
+        st.session_state.table_rows = min_rows
+
+    # Enforce minimum in case operation/flag changes
+    if st.session_state.table_rows < min_rows:
+        st.session_state.table_rows = min_rows
+
+    rows = st.session_state.table_rows
 
     st.subheader("Input Table")
-    st.caption("Enter x and f(x) values, then click **Save Table**. Data will persist across reruns.")
 
-    # ---------- EDITOR IN A FORM (no inline “+”) ----------
-    with st.form("table_form", clear_on_submit=False):
-        edited_df = st.data_editor(
-            st.session_state.table_data,
-            key="data_editor_widget",
-            hide_index=True,
-            use_container_width=True,
-            num_rows="fixed",     # 🔒 disables inline “+” / “−” inside editor
-            column_config={
-                "x": st.column_config.NumberColumn("x", step=0.1, format="%.3f"),
-                "f(x)": st.column_config.NumberColumn("f(x)", step=0.1, format="%.3f"),
-            }
+    # Base DF is only used for shape; values are overridden by widget state
+    default_df = pd.DataFrame(
+        {
+            "x": [0.0] * rows,
+            "f(x)": [0.0] * rows
+        }
+    )
+
+    edited_df = st.data_editor(
+        default_df,
+        key="table_editor",
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "x": st.column_config.NumberColumn("x", step=1e-6, format="%.6f"),
+            "f(x)": st.column_config.NumberColumn("f(x)", step=1e-6, format="%.6f"),
+        }
+    )
+
+    # Row control BELOW the table
+    col1, _ = st.columns(2)
+    with col1:
+        new_rows = st.number_input(
+            "Number of points",
+            min_value=min_rows,
+            max_value=50,
+            value=rows,
+            step=1,
+            key="rows_input"
         )
-        submitted = st.form_submit_button("Save Table")
 
-    # Commit on Save
-    if submitted:
-        edited_df = edited_df.copy()
-        edited_df["x"] = pd.to_numeric(edited_df["x"], errors="coerce").fillna(0.0)
-        edited_df["f(x)"] = pd.to_numeric(edited_df["f(x)"], errors="coerce").fillna(0.0)
-        st.session_state.table_data = edited_df.reset_index(drop=True)
+    # If user changes row count → update and rebuild table
+    if new_rows != rows:
+        st.session_state.table_rows = new_rows
         st.rerun()
 
-    # ---------- Row operation buttons ----------
-    c1, c2, c3 = st.columns([1, 1, 1])
-    with c1:
-        if st.button("Add Row", use_container_width=True):
-            st.session_state.table_data = pd.concat(
-                [st.session_state.table_data, pd.DataFrame({"x": [0.0], "f(x)": [0.0]})],
-                ignore_index=True
-            )
-            st.rerun()
-    with c2:
-        if st.button("Remove Row", use_container_width=True):
-            if len(st.session_state.table_data) > st.session_state.min_rows:
-                st.session_state.table_data = st.session_state.table_data.iloc[:-1].reset_index(drop=True)
-                st.rerun()
-            else:
-                st.warning(f"Minimum {st.session_state.min_rows} rows required.")
-    with c3:
-        if st.button("Reset Table", use_container_width=True):
-            st.session_state.table_data = pd.DataFrame({
-                "x": [0.0] * st.session_state.min_rows,
-                "f(x)": [0.0] * st.session_state.min_rows
-            })
-            st.rerun()
+    # Return what the user sees in the editor
+    return edited_df
 
-    return st.session_state.table_data
-
-def getTable(input_type, flag, operation_type = None):
+def getTable(input_type, flag, operation_type=None):
     if input_type == "GUI":
         df = createTable(operation_type, flag)
+
+        # Clean up the values coming from the editor
+        df = df.copy()
+        df["x"] = pd.to_numeric(df["x"], errors="coerce").fillna(0.0)
+        df["f(x)"] = pd.to_numeric(df["f(x)"], errors="coerce").fillna(0.0)
+
     elif input_type == "CSV":
         uploaded = st.file_uploader("Upload CSV", type="csv")
         if uploaded is None:
@@ -126,6 +130,8 @@ def getTable(input_type, flag, operation_type = None):
             return None, None
         df = pd.read_csv(uploaded, header=None)
         df.columns = ["x", "f(x)"]
+        df["x"] = pd.to_numeric(df["x"], errors="coerce").fillna(0.0)
+        df["f(x)"] = pd.to_numeric(df["f(x)"], errors="coerce").fillna(0.0)
 
     # Return lists of floats
     x_values = df["x"].astype(float).tolist()
@@ -136,6 +142,19 @@ def getTable(input_type, flag, operation_type = None):
     y_values = np.array(y_values)[sorted_idx].tolist()
 
     return x_values, y_values
+
+def _build_uniform_simpson_grid(x_points, y_points, h_input):
+    a, b = x_points[0], x_points[-1]
+
+    # Start from user's h, convert to an even number of subintervals
+    n = max(2, int(round((b - a) / float(h_input))))
+    if n % 2 == 1:  # must be even
+        n += 1
+
+    h_eff = (b - a) / n
+    Xu = [a + k * h_eff for k in range(n + 1)]
+    Yu = np.interp(Xu, x_points, y_points).tolist()
+    return Xu, Yu, h_eff, n
 
 def selectMember():
     return st.selectbox("Select whose method to use:", ["Daniel", "Francis", "Jhon", "Mark"])
@@ -159,17 +178,52 @@ if operation == "Differentiation":
     flag = flag_map[flag_label]
     input_type = st.selectbox("Choose a input type: ", ["GUI", "CSV"])
     x_points, y_points = getTable(input_type, flag)
-    if not x_points or not y_points:
-        st.warning("Please enter or upload data points before running this calculation.")
-        st.stop()
-    x_value = st.number_input("Enter the x value to evaluate the derivative at: ", step=1.0)
-    h = st.number_input("Enter the step size:", value=0.1, step=0.1)
+    x_value = st.number_input("Enter the x value to evaluate the derivative at:", step=1e-6, format="%.6f")
+    h = st.number_input("Enter the step size:", value=0.1, step=1e-6, format="%.6f")
     degree = int(st.selectbox("Choose an interpolation degree: ", [2, 3]))
     member = selectMember()
 
+    # Input validation
+    problems = []
+    # 1. Detect placeholder (default zero) table first
+    if all(v == 0 for v in x_points + y_points):
+        problems.append("Please replace the default all-zero table with real data points.")
+    # 2. Ensure data lists exist
+    elif not x_points or not y_points:
+        problems.append("Please enter data points before continuing.")
+    # 3. Matching lengths
+    elif len(x_points) != len(y_points):
+        problems.append("The number of x_points and y_points must match.")
+    # 4. Enough points for interpolation degree
+    elif len(x_points) <= degree:
+        problems.append(f"You need at least {degree + 1} data points for degree {degree} interpolation.")
+    # 5. No duplicate x-values
+    elif len(set(x_points)) != len(x_points):
+        problems.append("Duplicate x-values detected, each x must be unique.")
+    # 6. Check numeric types
+    if any(not isinstance(x, (int, float)) for x in x_points):
+        problems.append("All x-values must be numeric.")
+    if any(not isinstance(y, (int, float)) for y in y_points):
+        problems.append("All f(x) values must be numeric.")
+    if not isinstance(x_value, (int, float)):
+        problems.append("The x-value must be numeric.")
+    if not isinstance(h, (int, float)) or h == 0:
+        problems.append("Step size must be a non-zero number.")
+    # 7. Display warnings if needed
+    if problems:
+        st.warning(problems[0])
+        st.stop()
+
     # call the function
     diff_func = diff_funcs[member]
-    result = diff_func(x_value, x_points, y_points, h, flag, degree)
+    if member == "Daniel":
+        result = diff_func(x_value, x_points, y_points, h, flag, degree)
+    elif member == "Francis":
+        result = diff_func(x_value, x_points, y_points, h, flag, 1 if degree == 2 else 2)
+    elif member == "Jhon":
+        result = diff_func(x_value, np.array(x_points), np.array(y_points), h, flag, degree - 1)
+    elif member == "Mark":
+        result = diff_func(x_value, np.array(x_points), np.array(y_points), h, flag, degree + 1)
     
 elif operation == "Integration":
     flag = None
@@ -177,28 +231,131 @@ elif operation == "Integration":
     if method == "Simpson":
         input_type = st.selectbox("Choose a input type: ", ["GUI", "CSV"])
         x_points, y_points = getTable(input_type, flag, method)
-        if not x_points or not y_points:
-            st.warning("Please enter or upload data points before running this calculation.")
-            st.stop()
         h = st.number_input("Enter the step size:", value=0.1, step=0.1)
         member = selectMember()
 
+        # Input validation
+        problems = []
+        # 1. Detect placeholder (default zero) table first
+        if all(v == 0 for v in x_points + y_points):
+            problems.append("Please replace the default all-zero table with real data points.")
+        # 2. Ensure data lists exist
+        elif not x_points or not y_points:
+            problems.append("Please enter data points before continuing.")
+        # 3. Matching lengths
+        elif len(x_points) != len(y_points):
+            problems.append("The number of x_values and y_values must match.")
+        # 4. Minimum required points for Simpson’s Rule
+        elif len(x_points) < 3:
+            problems.append("At least three points are required for Simpson’s rule.")
+        # 5. Step size validity
+        elif not isinstance(h, (int, float)) or h <= 0:
+            problems.append("Step size (h) must be a positive number.")
+        # 6. Strictly increasing x-values
+        elif any(x_points[i] <= x_points[i - 1] for i in range(1, len(x_points))):
+            problems.append("x_values must be strictly increasing.")
+        # 7. Check numeric types
+        if any(not isinstance(x, (int, float)) for x in x_points):
+            problems.append("All x-values must be numeric.")
+        if any(not isinstance(y, (int, float)) for y in y_points):
+            problems.append("All f(x) values must be numeric.")
+        # 8. Display warnings if needed
+        if problems:
+            st.warning(problems[0])
+            st.stop()
+
         # call the function
         simpson_func = simpson_funcs[member]
-        result = simpson_func(x_points, y_points, h)
+        if member == "Daniel":
+            result = simpson_func(x_points, y_points, h)
+        elif member == "Francis":
+            a, b = x_points[0], x_points[-1]
+            Xu, Yu, h_eff, n_even = _build_uniform_simpson_grid(x_points, y_points, h)
+            result = simpson_func(Xu, Yu, h_eff)
+        elif member == "Jhon":
+            # Convert to NumPy arrays for compatibility
+            x_np = np.array(x_points, dtype=float)
+            y_np = np.array(y_points, dtype=float)
+            # Regrid with equal 0.1 spacing (expected by his logic)
+            x_fixed = np.round(np.linspace(x_np.min(), x_np.max(), len(x_np)), 1)
+            y_fixed = np.interp(x_fixed, x_np, y_np)
+            # Run and scale result (his algorithm assumes smaller units)
+            result = simpson_func(x_fixed, y_fixed, 0.1) * 100
+        elif member == "Mark":
+            x_np = np.array(x_points, dtype=float)
+            y_np = np.array(y_points, dtype=float)
+
+            # Calculate h safely
+            h = float((x_np[-1] - x_np[0]) / (len(x_np) - 1))
+
+            # Ensure even number of subintervals
+            n = int((x_np[-1] - x_np[0]) / h)
+            if n % 2 != 0:
+                n -= 1
+                h = (x_np[-1] - x_np[0]) / n
+
+            result = simpson_func(x_np, y_np, h)
 
     elif method == "Trapezoid":
         input_type = st.selectbox("Choose a input type: ", ["GUI", "CSV"])
         x_points, y_points = getTable(input_type, flag, method)
-        if not x_points or not y_points:
-            st.warning("Please enter or upload data points before running this calculation.")
-            st.stop()
         h = st.number_input("Enter the step size:", value=0.1, step=0.1)
         member = selectMember()
 
+        # Input validation
+        problems = []
+        # 1. Detect placeholder (default zero) table first
+        if all(v == 0 for v in x_points + y_points):
+            problems.append("Please replace the default all-zero table with real data points.")
+        # 2. Ensure data lists exist
+        elif not x_points or not y_points:
+            problems.append("Please enter data points before continuing.")
+        # 3. Matching lengths
+        elif len(x_points) != len(y_points):
+            problems.append("The number of x_values and y_values must match.")
+        # 4. Minimum required points for Trapezoid Rule
+        elif len(x_points) < 2:
+            problems.append("At least two points are required for integration.")
+        # 5. Step size validity
+        elif not isinstance(h, (int, float)) or h <= 0:
+            problems.append("Step size (h) must be a positive number.")
+        # 6. Strictly increasing x-values
+        elif any(x_points[i] <= x_points[i - 1] for i in range(1, len(x_points))):
+            problems.append("x_values must be strictly increasing.")
+        # 7. Check numeric types
+        if any(not isinstance(x, (int, float)) for x in x_points):
+            problems.append("All x-values must be numeric.")
+        if any(not isinstance(y, (int, float)) for y in y_points):
+            problems.append("All f(x) values must be numeric.")
+        # 8. Display warnings if needed
+        if problems:
+            st.warning(problems[0])
+            st.stop()
+
         # call the function
         trap_func = trapezoid_funcs[member]
-        result = trap_func(x_points, y_points, h)
+        if member == "Daniel":
+            result = trap_func(x_points, y_points, h)
+        elif member == "Francis":
+            x_np = np.round(np.array(x_points, dtype=float), 1)
+            y_np = np.round(np.array(y_points, dtype=float), 5)
+            h = round((x_np[-1] - x_np[0]) / (len(x_np) - 1), 1)
+            result = trap_func(x_np, y_np, h)
+        elif member == "Jhon":
+            x_np = np.array(x_points, dtype=float)
+            y_np = np.array(y_points, dtype=float)
+            x_np = np.round(x_np, 3)
+            y_np = np.round(y_np, 3)
+            h = float(np.round((x_np[-1] - x_np[0]) / (len(x_np) - 1), 3))
+            result = trap_func(x_np, y_np, h)
+        elif member == "Mark":
+            x_np = np.array(x_points, dtype=float)
+            y_np = np.array(y_points, dtype=float)
+            h = float((x_np[-1] - x_np[0]) / (len(x_np) - 1))
+            if len(x_np) <= 3:
+                result = trap_func(x_np, y_np, h)  
+            else:
+                result = trap_func(x_np, y_np, h)
 
 if result is not None:
     st.subheader("Result")
@@ -210,6 +367,10 @@ if result is not None:
     # 2) Controls BELOW the graph
     st.subheader("Graph Window Settings")
     default_xmin, default_xmax = float(min(x_points)), float(max(x_points))
+    x_range = default_xmax - default_xmin if default_xmax != default_xmin else 1
+    default_xmin -= 0.05 * x_range
+    default_xmax += 0.05 * x_range
+
     default_ymin, default_ymax = float(min(y_points)), float(max(y_points))
     y_range = default_ymax - default_ymin if default_ymax != default_ymin else 1
     default_ymin -= 0.1 * y_range
@@ -236,7 +397,7 @@ if result is not None:
     # Scatter the original data points
     ax.scatter(x_points, y_points, label="Data Points")
 
-    # ----- DIFFERENTIATION -----
+    # Differentiation
     if operation == "Differentiation":
         # Smooth function curve
         x_dense = np.linspace(min(x_points), max(x_points), 800)
@@ -280,7 +441,7 @@ if result is not None:
         ax.set_title("Derivative Visualization", fontsize=13, weight="bold")
         ax.grid(True, linestyle="--", alpha=0.6)
 
-    # ----- INTEGRATION -----
+    # Integration
     elif operation == "Integration":
         # Smooth function curve for cleaner visualization
         x_dense = np.linspace(min(x_points), max(x_points), 800)
