@@ -101,32 +101,22 @@ def main():
     st.markdown("<br><br><h2 style = 'text-align:center'>Non-linear Optimization</h2>", unsafe_allow_html = True)
 
 
-    left, mid, right = st.columns([1, 0.05, 1])
 
-    with left:
-        st.markdown("<p style = 'text-align:justify'> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>", unsafe_allow_html = True)
-
-    with right:
-        st.markdown("<p style = 'text-align:justify'> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>", unsafe_allow_html = True)
-
-    st.markdown("<br><p style = 'text-align:justify'> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>", unsafe_allow_html = True)
-
-
-
-
-    st.markdown("<br><br><h2 style = 'text-align:center'>Signal Processing</h2>", unsafe_allow_html = True)
-
+    l, m, r = st.columns([1, 3, 1])
+    with m:
+        st.markdown("<h5 style = 'text-align:justify'>What is Does:</h5><p style = 'text-align:center'>This tool allows for the evaluation of the minimum or maximum of a function on a particular interval. The tool has functionality for two methods of non-linear optimization: Golden-Section and Newton Min/Max. It returns the value of the point on the x-axis where there is a min/max and the number of iterations the method took to reach a result</p>", unsafe_allow_html = True)
 
     left, mid, right = st.columns([1, 0.05, 1])
-
     with left:
-        st.markdown("<p style = 'text-align:justify'> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>", unsafe_allow_html = True)
+
+
+        st.markdown("<br><h5 style = 'text-align:justify'>How to Use:</h5><h6 style = 'text-align:center'>Golden-Section:</h6><ul><li>To evaluate the max/min of a function using the Golden-Section method, enter a function and choose a left and right bound which enclose a min/max</li><li>Enter a value for the acceptable error threshold; this number determines the level of accuracy of the result</li><li>Select whether you would like to find a minimum or a maximum and then press compute</li></ul><br><h6 style = 'text-align:center'>Newton Min/Max:</h6><ul><li>To evaluate the min/max of a function using the Newton Min/Max method, enter a function and enter an initial guess for the min/max of the function</li><li>The result of this method is dependent on the initial guess as the result will either be a minimum or a maximum depending on which is closer</li><li>Similar to the Golden-Section method, this method also requires a value for the acceptable error threshold which indicates the level of accuracy of the result</li></ul>", unsafe_allow_html = True)
 
     with right:
-        st.markdown("<p style = 'text-align:justify'> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>", unsafe_allow_html = True)
+        st.markdown("<br><h5 style = 'text-align: justify'>Extra Tips:</h5><ul><li>The user may enter various functions and even functions containing pi or e^x. The user may also use functions such as log(x), trigonometric functions and inverse trigonometric functions</li><li>When entering some functions such as log(x), consider the domain of the function when selecting points<li>After entering a function, use the graph to analyze the function and locate an interval which brackets a min/max or to make an initial guess for the min/max</li><li>Note: You can use either ^ or ** to represent raising a number to an exponent</li><li>Other operations are represented by *, /, +, -, and parentheses can be used for grouping</li></ul>", unsafe_allow_html = True)
 
-    st.markdown("<br><p style = 'text-align:justify'> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>", unsafe_allow_html = True)
-
+    st.markdown("<br><br>", unsafe_allow_html = True)
+    st.divider()
 
 if __name__ == "__main__":
     main()
