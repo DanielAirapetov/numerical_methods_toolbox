@@ -177,7 +177,7 @@ def main():
                         if method == "Gauss-Seidel":
                             results, iters = markGS.gaussSeidelMethod(matrix, tolerance, flag)
                         else:
-                            results, iters = markJ.gaussSeidelMethod(matrix, tolerance, flag)
+                            results, iters = markJ.jacobiMethod(matrix, tolerance, flag)
                     else: #Jhon
                         if method == "Gauss-Seidel":
                             results, iters = jhonGS.gauss_seidel(matrix,tolerance,flag)

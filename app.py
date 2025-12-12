@@ -52,7 +52,7 @@ def main():
 
     st.markdown(
             """
-            <div style = 'text-align: center; margin-top:30px; margin-bottom:-25px;'>
+            <div style = 'text-align: center; margin-top:30px; margin-bottom:-10px;'>
                 <a href='./documentation' target = "_self" style='font-size:22px; color:inherit; text-decoration:none;'>
                     See Documentation
                 </a>
@@ -60,7 +60,7 @@ def main():
             """, unsafe_allow_html=True)
 
 
-    st.markdown("<br><h4 style='text-align:center;'>Welcome! Please select a method below:</h4>", unsafe_allow_html = True)
+    st.markdown("<h4 style='text-align:center; margin-top:20px'>Welcome! Please select a method below:</h4>", unsafe_allow_html = True)
 
         
     # this creates a horizontal line and removes the padding from it

@@ -104,7 +104,7 @@ def main():
 
     l, m, r = st.columns([1, 3, 1])
     with m:
-        st.markdown("<h5 style = 'text-align:justify'>What is Does:</h5><p style = 'text-align:center'>This tool allows for the evaluation of the minimum or maximum of a function on a particular interval. The tool has functionality for two methods of non-linear optimization: Golden-Section and Newton Min/Max. It returns the value of the point on the x-axis where there is a min/max and the number of iterations the method took to reach a result</p>", unsafe_allow_html = True)
+        st.markdown("<p style = 'text-align:center'>This tool allows for the evaluation of the minimum or maximum of a function on a particular interval. The tool has functionality for two methods of non-linear optimization: Golden-Section and Newton Min/Max. It returns the value of the point on the x-axis where there is a min/max and the number of iterations the method took to reach a result</p>", unsafe_allow_html = True)
 
     left, mid, right = st.columns([1, 0.05, 1])
     with left:
