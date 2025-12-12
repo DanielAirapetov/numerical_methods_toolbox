@@ -31,15 +31,6 @@ def main():
         st.markdown("<h1 style='text-align:center; margin-bottom:-20px;'>Numerical Methods Toolbox</h1>",unsafe_allow_html=True)
         st.markdown("<br><h3 style='text-align:center;'>Daniel Airepetov, Jhon Palaguachi, Mark Pepaj, Francis Scullin</h3>", unsafe_allow_html = True)
 
-        st.markdown(
-                """
-                <div style = 'text-align: center; margin-top:-30px; margin-bottom:30px;'>
-                    <a href='./documentation' target = "_self" style='font-size:22px; color:inherit; text-decoration:none;'>
-                        See Documentation
-                    </a>
-                </div>
-                """, unsafe_allow_html=True)
-
 
 
 
@@ -59,8 +50,17 @@ def main():
 
 
 
+    st.markdown(
+            """
+            <div style = 'text-align: center; margin-top:30px; margin-bottom:-25px;'>
+                <a href='./documentation' target = "_self" style='font-size:22px; color:inherit; text-decoration:none;'>
+                    See Documentation
+                </a>
+            </div>
+            """, unsafe_allow_html=True)
 
-    st.markdown("<br><br><h4 style='text-align:center;'>Welcome! Please select a method below:</h4>", unsafe_allow_html = True)
+
+    st.markdown("<br><h4 style='text-align:center;'>Welcome! Please select a method below:</h4>", unsafe_allow_html = True)
 
         
     # this creates a horizontal line and removes the padding from it
@@ -76,35 +76,26 @@ def main():
         </style>
         """, unsafe_allow_html = True)
 
-        left_col, mid_col, right_col = st.columns([1, 3, 1])
+        left, mid_left, mid, mid_right, right = st.columns([1, 1, 0.05, 1, 1])
 
-        with mid_col:
+        with mid_left:
 
-
-            left_col1, mid_col1, right_col1 = st.columns([1, 1, 1])
-
-            with left_col1:
-                if st.button("Non-linear Equations", use_container_width = True):
-                    st.switch_page("pages/non_linear_equations.py")
-            with mid_col1:
-                if st.button("Linear Systems", use_container_width = True):
-                    st.switch_page("pages/linear_systems.py")
-            with right_col1:
-                if st.button("Calculus", use_container_width = True):
-                    st.switch_page("pages/calculus.py")
-
+            if st.button("Non-linear Equations", use_container_width = True):
+                st.switch_page("pages/non_linear_equations.py")
 
             st.markdown("<br>", unsafe_allow_html = True)
 
+            if st.button("Calculus", use_container_width = True):
+                st.switch_page("pages/calculus.py")
 
-            left_space, left_col2, mid_col2, right_col2, right_space = st.columns([1, 2, 0.01, 2, 1])
+        with mid_right:
+            if st.button("Linear Systems", use_container_width = True):
+                st.switch_page("pages/linear_systems.py")
 
-            with left_col2:
-                if st.button("Non-linear Optimization", use_container_width = True):
-                    st.switch_page("pages/non_linear_optimization.py")
-            with right_col2:
-                if st.button("Signal Processing", use_container_width = True):
-                    st.switch_page("pages/signal_processing.py")
+            st.markdown("<br>", unsafe_allow_html = True)
+
+            if st.button("Non-linear Optimization", use_container_width = True):
+                st.switch_page("pages/non_linear_optimization.py")
 
 
     st.markdown("<br><br>", unsafe_allow_html = True)
