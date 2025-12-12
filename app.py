@@ -31,15 +31,6 @@ def main():
         st.markdown("<h1 style='text-align:center; margin-bottom:-20px;'>Numerical Methods Toolbox</h1>",unsafe_allow_html=True)
         st.markdown("<br><h3 style='text-align:center;'>Daniel Airepetov, Jhon Palaguachi, Mark Pepaj, Francis Scullin</h3>", unsafe_allow_html = True)
 
-        st.markdown(
-                """
-                <div style = 'text-align: center; margin-top:-30px; margin-bottom:30px;'>
-                    <a href='./documentation' target = "_self" style='font-size:22px; color:inherit; text-decoration:none;'>
-                        See Documentation
-                    </a>
-                </div>
-                """, unsafe_allow_html=True)
-
 
 
 
@@ -59,8 +50,17 @@ def main():
 
 
 
+    st.markdown(
+            """
+            <div style = 'text-align: center; margin-top:30px; margin-bottom:-25px;'>
+                <a href='./documentation' target = "_self" style='font-size:22px; color:inherit; text-decoration:none;'>
+                    See Documentation
+                </a>
+            </div>
+            """, unsafe_allow_html=True)
 
-    st.markdown("<br><br><h4 style='text-align:center;'>Welcome! Please select a method below:</h4>", unsafe_allow_html = True)
+
+    st.markdown("<br><h4 style='text-align:center;'>Welcome! Please select a method below:</h4>", unsafe_allow_html = True)
 
         
     # this creates a horizontal line and removes the padding from it
