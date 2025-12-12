@@ -73,12 +73,12 @@ def main():
     left, mid, right = st.columns([1, 0.05, 1])
 
     with left:
-        st.markdown("<p style = 'text-align:justify'> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>", unsafe_allow_html = True)
+        st.markdown("<p style = 'text-align:justify'>This page provides tools for solving linear systems using both direct (Gaussian and Gauss–Jordan elimination) and iterative (Jacobi and Gauss–Seidel) methods. Users may enter an augmented matrix either through the built-in GUI editor or by uploading a CSV file, but in all cases the matrix must be n x (n+1).</p>", unsafe_allow_html = True)
 
     with right:
-        st.markdown("<p style = 'text-align:justify'> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>", unsafe_allow_html = True)
+        st.markdown("<p style = 'text-align:justify'>Direct methods require only that the coefficient matrix be square and nonsingular, while iterative methods require additional conditions for convergence: the coefficient matrix should ideally be strictly diagonally dominant or symmetric positive definite, and poorly conditioned matrices may lead to slow convergence or divergence.</p>", unsafe_allow_html = True)
  
-    st.markdown("<br><p style = 'text-align:justify'> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>", unsafe_allow_html = True)
+    st.markdown("<br><p style = 'text-align:justify'>The interface allows users to select a method type, input format, and the group member’s implementation to run. After computation, the solution vector (and iteration count when applicable) is displayed directly through Streamlit.</p>", unsafe_allow_html = True)
 
 
     # calculus documentation
