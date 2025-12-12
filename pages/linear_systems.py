@@ -27,20 +27,20 @@ def printResults(results, method, member):
 
 
 def createMatrix():
-    # Initialize session state
+    # initialize session state
     if "rows" not in st.session_state:
         st.session_state.rows = 3
     if "cols" not in st.session_state:
         st.session_state.cols = 4
 
-    # Build table from current sizes
+    # build table from current sizes
     default_df = pd.DataFrame(
         [[0] * st.session_state.cols for _ in range(st.session_state.rows)]
     )
 
     edited_df = st.data_editor(default_df, key="matrix_editor")
 
-    # Controls BELOW the table
+    # controls below the table
     col1, col2 = st.columns(2)
 
     with col1:
@@ -55,7 +55,7 @@ def createMatrix():
         )
     
 
-    # If user changes rows/cols → update state and rerun
+    # if user changes rows/cols, update state and rerun
     if new_rows != st.session_state.rows or new_cols != st.session_state.cols:
         st.session_state.rows = new_rows
         st.session_state.cols = new_cols
@@ -69,7 +69,7 @@ def createMatrix():
 
 def getMatrix(input_type):
     if input_type == "GUI":
-        return createMatrix()
+        return createMatrix() #call helper funtion from earlier
     else:  # CSV
         uploaded = st.file_uploader("Upload augmented matrix as CSV", type="csv")
         if uploaded is None:
@@ -86,55 +86,53 @@ def selectMember():
     return st.selectbox("Select whose method to use:", ["Daniel", "Francis", "Jhon", "Mark"])
 
 def main():
-    left, center, right = st.columns([1, 3, 1])
+    left, center, right = st.columns([1, 3, 1]) # used columns to set up main operations in center and back button on left
 
-    with left:
-        with st.container():
+    with left: # this puts back button to the left
+        with st.container(): 
             st.markdown("<div class = 'lower-button'>", unsafe_allow_html = True)
             if st.button("Back"):
                 st.switch_page("app.py")
             st.markdown("</div>", unsafe_allow_html = True)
             
 
-    with center:
+    with center: # main operations are in the center "column"
 
-        st.markdown("<h1 style='text-align:center; margin-bottom:-20px; margin-top:-5px'>Solving Systems of Equations</h1>",unsafe_allow_html=True)
-
+        st.markdown("<h1 style='text-align:center; margin-bottom:-20px; margin-top:-5px'>Solving Systems of Equations</h1>",unsafe_allow_html=True) #injects css to style title
         method_type = st.selectbox("Choose a method type:", ["Direct", "Iterative"])
-
         if method_type == "Direct":
-            method = st.selectbox("Choose a method:", ["Gaussian", "Gauss-Jordan"])
-            input_type = st.selectbox("Choose a input type: ", ["GUI", "CSV"])
-            matrix = getMatrix(input_type)
+            method = st.selectbox("Choose a method:", ["Gaussian", "Gauss-Jordan"]) # get method using drop down menu
+            input_type = st.selectbox("Choose a input type: ", ["GUI", "CSV"]) # get input type
+            matrix = getMatrix(input_type) # use getMatrix helper function
             member = selectMember()
 
-            if st.button("Solve Direct"):
-                if matrix is None:
-                    st.error("Please provide a matrix first.")
+            if st.button("Solve Direct"): # push to solve button:
+                if matrix is None: # need to have a matrix inputted to solve
+                    st.error("Please provide a matrix first.") 
                 else:
                     results = None
 
-                    if member == "Francis":
+                    if member == "Francis": # implemented my functions
                         if method == "Gaussian":
                             reduced = frankieG.gauss_elim(matrix.copy())
                             results = frankieG.back_sub(reduced)
                         else:  # Gauss-Jordan
                             results = frankieGJ.GJ_elim(matrix.copy())
 
-                    elif member == "Mark":
+                    elif member == "Mark": # Marks functions
                         if method == "Gaussian":
                             results = markG.gaussianEliminationMethod(matrix.copy())
                         else:  # Gauss-Jordan
                             results = markGJ.gaussJordanElimination(matrix.copy())
 
-                    elif member == "Daniel":
-                        list = matrix.tolist()
+                    elif member == "Daniel": # implemented daniels
+                        list = matrix.tolist() # daniel used python lists so need to convert
                         if method == "Gaussian":
                             results = danielG.gaussian_elimination(list)
                         else:  # Gauss-Jordan
                             results = danielGJ.gauss_jordan_elimination(list)
 
-                    else:
+                    else: # Jhons functions
                         if method == "Gaussian":
                             results = jhonG.gaussian(matrix.copy())
                         else: 
@@ -153,41 +151,41 @@ def main():
                 if matrix is None:
                     st.error("Please provide a matrix first.")
                 else:
-                    initial = np.zeros(matrix.shape[0])
-                    tolerance = 0.001
-                    flag = 4
+                    initial = np.zeros(matrix.shape[0]) # set up certain hardcoded values 
+                    tolerance = 0.001 # tolerance thresh
+                    flag = 4 # hardcoded true RMSE because generally most accurate
 
-                    results = None
-                    iters = None
+                    results = None #initialize results and iterations
+                    iters = None 
 
-                    if member == "Francis":
+                    if member == "Francis": # My functions
                         if method == "Gauss-Seidel":
                             results, iters = frankieGS.GaussSiedel(matrix, initial, tolerance, flag)
                         else:  # Jacobi
                             results, iters = frankieJ.Jacobi(matrix, initial, tolerance, flag)
 
-                    elif member == "Daniel":
-                        list = matrix.tolist()
+                    elif member == "Daniel": # Daniels functions
+                        list = matrix.tolist() #convert to list 
                         if method == "Gauss-Seidel":
                             results, iters = danielGS.gauss_seidel_iterative_method(list, tolerance, flag)
                         else:  # Jacobi
                             results, iters = danielJ.jacobi_iterative_method(list, tolerance, flag)
 
-                    elif member == "Mark":
+                    elif member == "Mark": #mark functions
                         if method == "Gauss-Seidel":
                             results, iters = markGS.gaussSeidelMethod(matrix, tolerance, flag)
                         else:
                             results, iters = markJ.jacobiMethod(matrix, tolerance, flag)
-                    else: #Jhon
+                    else: #Jhon function
                         if method == "Gauss-Seidel":
                             results, iters = jhonGS.gauss_seidel(matrix,tolerance,flag)
                         else:
                             results, iters = jhonJ.jacobi_method(matrix,tolerance,flag)
             
                     if results is not None:
-                        printResults(results, method, member)
-                        if iters is not None:
+                        printResults(results, method, member) # call printResults helper 
+                        if iters is not None: # print iteration counter 
                             st.write("Iterations:", iters)
 
-if __name__ == "__main__":
+if __name__ == "__main__": # if you only want to run linear_systems page
     main()
