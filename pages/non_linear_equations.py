@@ -164,7 +164,7 @@ def main():
                     else:
                         if person == "Daniel":
                             if st.button("Calculate Root"):
-                                root, iterations = daniel_false_position.falsePosition(left_bound, right_bound, tolerance, function)
+                                root, iterations = daniel_false_position.falsePosition(left_bound, right_bound, tolerance, flag, function)
                                 st.write(f"Root: {root}, Iterations: {iterations}")
                 elif method == "False Position Method" and user_input_valid:
                     if person == "Mark":
