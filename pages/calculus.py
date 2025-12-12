@@ -58,7 +58,7 @@ trapezoid_funcs = {
 
 def createTable(operation, flag):
     # Determine minimum rows based on operation/flag
-    if operation == "Trapezoid" or flag == "a":   # "a" == 2-point forward
+    if operation == "Trapezoid" or flag == "a": # "a" == 2-point forward
         min_rows = 2
     else:
         min_rows = 3
@@ -94,7 +94,7 @@ def createTable(operation, flag):
         }
     )
 
-    # Row control BELOW the table
+    # Row control below the table
     col1, _ = st.columns(2)
     with col1:
         new_rows = st.number_input(
@@ -106,7 +106,7 @@ def createTable(operation, flag):
             key="rows_input"
         )
 
-    # If user changes row count → update and rebuild table
+    # If user changes row count then update and rebuild table
     if new_rows != rows:
         st.session_state.table_rows = new_rows
         st.rerun()
@@ -144,7 +144,7 @@ def _build_uniform_simpson_grid(x_points, y_points, h_input):
 
     # Start from user's h, convert to an even number of subintervals
     n = max(2, int(round((b - a) / float(h_input))))
-    if n % 2 == 1:  # must be even
+    if n % 2 == 1:  # Must be even
         n += 1
 
     h_eff = (b - a) / n
@@ -160,7 +160,7 @@ operation = st.selectbox("Choose an operation:", ["Differentiation", "Integratio
 result = None
 
 if operation == "Differentiation":
-    # gather inputs: (x_value, x_points, y_points, h, flag, degree)
+    # Gather inputs: (x_value, x_points, y_points, h, flag, degree)
     flag_label = st.selectbox(
         "Choose the differentiation type:",
         ["2-point forward difference", "3-points forward difference", "3-point centered difference"]
@@ -219,7 +219,7 @@ if operation == "Differentiation":
         st.warning(problems[0])
         st.stop()
 
-    # call the function
+    # Call the correct function
     diff_func = diff_funcs[member]
     if member == "Daniel":
         result = diff_func(x_value, x_sorted, y_sorted, h, flag, degree)
@@ -278,7 +278,7 @@ elif operation == "Integration":
             st.warning(problems[0])
             st.stop()
 
-        # call the function
+        # Call the correct function
         simpson_func = simpson_funcs[member]
         if member == "Daniel":
             result = simpson_func(x_sorted, y_sorted, h)
@@ -290,10 +290,10 @@ elif operation == "Integration":
             # Convert to NumPy arrays for compatibility
             x_np = np.array(x_sorted, dtype=float)
             y_np = np.array(y_sorted, dtype=float)
-            # Regrid with equal 0.1 spacing (expected by his logic)
+            # Regrid with equal 0.1 spacing
             x_fixed = np.round(np.linspace(x_np.min(), x_np.max(), len(x_np)), 1)
             y_fixed = np.interp(x_fixed, x_np, y_np)
-            # Run and scale result (his algorithm assumes smaller units)
+            # Run and scale result
             result = simpson_func(x_fixed, y_fixed, 0.1)
         elif member == "Mark":
             x_np = np.array(x_sorted, dtype=float)
@@ -355,7 +355,7 @@ elif operation == "Integration":
             st.warning(problems[0])
             st.stop()
 
-        # call the function
+        # # Call the correct function
         trap_func = trapezoid_funcs[member]
         if member == "Daniel":
             result = trap_func(x_sorted, y_sorted, h)
@@ -381,12 +381,12 @@ elif operation == "Integration":
 
 if result is not None:
     st.subheader("Result")
-    st.write("**Computed Value:**", result)
+    st.write("Computed Value: ", result)
 
-    # 1) Reserve a spot ABOVE the controls for the graph
+    # Reserve a spot above the controls for the graph
     graph_ph = st.empty()
 
-    # --- Compute fresh default window correctly ---
+    # Compute fresh default window correctly
     default_xmin, default_xmax = float(min(x_points)), float(max(x_points))
     default_ymin, default_ymax = float(min(y_points)), float(max(y_points))
 
@@ -399,13 +399,13 @@ if result is not None:
     default_ymin -= 0.1 * y_range
     default_ymax += 0.1 * y_range
 
-    # --- Floor/Ceil defaults (cleaner numbers) ---
+    # Floor/Ceil defaults
     init_x_min = math.floor(default_xmin)
     init_x_max = math.ceil(default_xmax)
     init_y_min = math.floor(default_ymin)
     init_y_max = math.ceil(default_ymax)
 
-    # --- Reset window when data changes ---
+    # Reset window when data changes
     axes_sig = (
         operation,
         len(x_points),
@@ -431,11 +431,11 @@ if result is not None:
         y_min = st.number_input("Y-axis minimum", value=default_ymin, step=1.0, key="y_min_num")
         y_max = st.number_input("Y-axis maximum", value=default_ymax, step=1.0, key="y_max_num")
 
-    # (Optional) basic guard so bad limits don't crash the plot
+    # Basic guard so bad limits don't crash the plot
     if x_min >= x_max: x_min, x_max = default_xmin, default_xmax
     if y_min >= y_max: y_min, y_max = default_ymin, default_ymax
 
-    # 3) Build the figure AFTER reading controls, then render into the placeholder
+    # Build the figure after reading controls, then render into the placeholder
     fig, ax = plt.subplots()
 
     # Scatter the original data points
@@ -473,7 +473,7 @@ if result is not None:
         ax.annotate(f"slope ≈ {slope:.4g}", xy=(x_value, f_x),
                     xytext=(10, 10), textcoords="offset points", fontsize=9)
 
-        # Optional: coordinate label for the tangent point
+        # Coordinate label for the tangent point
         ax.annotate(f"({x_value:.2f}, {f_x:.2f})",
                     xy=(x_value, f_x),
                     xytext=(10, -15),
@@ -528,5 +528,5 @@ if result is not None:
     ax.legend()
     fig.tight_layout()
 
-    # Render once, above the controls
+    # Render once above the controls
     graph_ph.pyplot(fig)
