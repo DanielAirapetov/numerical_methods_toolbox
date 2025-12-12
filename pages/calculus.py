@@ -137,10 +137,6 @@ def getTable(input_type, flag, operation_type=None):
     x_values = df["x"].astype(float).tolist()
     y_values = df["f(x)"].astype(float).tolist()
 
-    sorted_idx = np.argsort(x_values)
-    x_values = np.array(x_values)[sorted_idx].tolist()
-    y_values = np.array(y_values)[sorted_idx].tolist()
-
     return x_values, y_values
 
 def _build_uniform_simpson_grid(x_points, y_points, h_input):
@@ -178,8 +174,17 @@ if operation == "Differentiation":
     flag = flag_map[flag_label]
     input_type = st.selectbox("Choose a input type: ", ["GUI", "CSV"])
     x_points, y_points = getTable(input_type, flag)
-    x_value = st.number_input("Enter the x value to evaluate the derivative at:", step=1e-6, format="%.6f")
-    h = st.number_input("Enter the step size:", value=0.1, step=1e-6, format="%.6f")
+    if not x_points or not y_points:
+        st.stop()
+
+    x_sorted = np.array(x_points, dtype=float)
+    y_sorted = np.array(y_points, dtype=float)
+    sort_idx = np.argsort(x_sorted)
+    x_sorted = x_sorted[sort_idx]
+    y_sorted = y_sorted[sort_idx]
+
+    x_value = st.number_input("Enter the x value to evaluate the derivative at:", step=1.0, format="%.6f")
+    h = st.number_input("Enter the step size:", value=0.01, step=0.01, format="%.6f")
     degree = int(st.selectbox("Choose an interpolation degree: ", [2, 3]))
     member = selectMember()
 
@@ -217,13 +222,13 @@ if operation == "Differentiation":
     # call the function
     diff_func = diff_funcs[member]
     if member == "Daniel":
-        result = diff_func(x_value, x_points, y_points, h, flag, degree)
+        result = diff_func(x_value, x_sorted, y_sorted, h, flag, degree)
     elif member == "Francis":
-        result = diff_func(x_value, x_points, y_points, h, flag, 1 if degree == 2 else 2)
+        result = diff_func(x_value, x_sorted, y_sorted, h, flag, 1 if degree == 2 else 2)
     elif member == "Jhon":
-        result = diff_func(x_value, np.array(x_points), np.array(y_points), h, flag, degree - 1)
+        result = diff_func(x_value, np.array(x_sorted), np.array(y_sorted), h, flag, degree - 1)
     elif member == "Mark":
-        result = diff_func(x_value, np.array(x_points), np.array(y_points), h, flag, degree + 1)
+        result = diff_func(x_value, np.array(x_sorted), np.array(y_sorted), h, flag, degree + 1)
     
 elif operation == "Integration":
     flag = None
@@ -231,7 +236,16 @@ elif operation == "Integration":
     if method == "Simpson":
         input_type = st.selectbox("Choose a input type: ", ["GUI", "CSV"])
         x_points, y_points = getTable(input_type, flag, method)
-        h = st.number_input("Enter the step size:", value=0.1, step=0.1)
+        if not x_points or not y_points:
+            st.stop()
+
+        x_sorted = np.array(x_points, dtype=float)
+        y_sorted = np.array(y_points, dtype=float)
+        sort_idx = np.argsort(x_sorted)
+        x_sorted = x_sorted[sort_idx]
+        y_sorted = y_sorted[sort_idx]
+
+        h = st.number_input("Enter the step size:", value=0.01, step=0.01, format="%.6f")
         member = selectMember()
 
         # Input validation
@@ -252,8 +266,8 @@ elif operation == "Integration":
         elif not isinstance(h, (int, float)) or h <= 0:
             problems.append("Step size (h) must be a positive number.")
         # 6. Strictly increasing x-values
-        elif any(x_points[i] <= x_points[i - 1] for i in range(1, len(x_points))):
-            problems.append("x_values must be strictly increasing.")
+        elif any(x_sorted[i] <= x_sorted[i - 1] for i in range(1, len(x_points))):
+            problems.append("x_values must be strictly increasing after sorting.")
         # 7. Check numeric types
         if any(not isinstance(x, (int, float)) for x in x_points):
             problems.append("All x-values must be numeric.")
@@ -267,23 +281,23 @@ elif operation == "Integration":
         # call the function
         simpson_func = simpson_funcs[member]
         if member == "Daniel":
-            result = simpson_func(x_points, y_points, h)
+            result = simpson_func(x_sorted, y_sorted, h)
         elif member == "Francis":
             a, b = x_points[0], x_points[-1]
-            Xu, Yu, h_eff, n_even = _build_uniform_simpson_grid(x_points, y_points, h)
+            Xu, Yu, h_eff, n_even = _build_uniform_simpson_grid(x_sorted, y_sorted, h)
             result = simpson_func(Xu, Yu, h_eff)
         elif member == "Jhon":
             # Convert to NumPy arrays for compatibility
-            x_np = np.array(x_points, dtype=float)
-            y_np = np.array(y_points, dtype=float)
+            x_np = np.array(x_sorted, dtype=float)
+            y_np = np.array(y_sorted, dtype=float)
             # Regrid with equal 0.1 spacing (expected by his logic)
             x_fixed = np.round(np.linspace(x_np.min(), x_np.max(), len(x_np)), 1)
             y_fixed = np.interp(x_fixed, x_np, y_np)
             # Run and scale result (his algorithm assumes smaller units)
             result = simpson_func(x_fixed, y_fixed, 0.1) * 100
         elif member == "Mark":
-            x_np = np.array(x_points, dtype=float)
-            y_np = np.array(y_points, dtype=float)
+            x_np = np.array(x_sorted, dtype=float)
+            y_np = np.array(y_sorted, dtype=float)
 
             # Calculate h safely
             h = float((x_np[-1] - x_np[0]) / (len(x_np) - 1))
@@ -299,7 +313,16 @@ elif operation == "Integration":
     elif method == "Trapezoid":
         input_type = st.selectbox("Choose a input type: ", ["GUI", "CSV"])
         x_points, y_points = getTable(input_type, flag, method)
-        h = st.number_input("Enter the step size:", value=0.1, step=0.1)
+        if not x_points or not y_points:
+            st.stop()
+
+        x_sorted = np.array(x_points, dtype=float)
+        y_sorted = np.array(y_points, dtype=float)
+        sort_idx = np.argsort(x_sorted)
+        x_sorted = x_sorted[sort_idx]
+        y_sorted = y_sorted[sort_idx]
+
+        h = st.number_input("Enter the step size:", value=0.01, step=0.01, format="%.6f")
         member = selectMember()
 
         # Input validation
@@ -320,8 +343,8 @@ elif operation == "Integration":
         elif not isinstance(h, (int, float)) or h <= 0:
             problems.append("Step size (h) must be a positive number.")
         # 6. Strictly increasing x-values
-        elif any(x_points[i] <= x_points[i - 1] for i in range(1, len(x_points))):
-            problems.append("x_values must be strictly increasing.")
+        elif any(x_sorted[i] <= x_sorted[i - 1] for i in range(1, len(x_points))):
+            problems.append("x_values must be strictly increasing after sorting.")
         # 7. Check numeric types
         if any(not isinstance(x, (int, float)) for x in x_points):
             problems.append("All x-values must be numeric.")
@@ -335,22 +358,22 @@ elif operation == "Integration":
         # call the function
         trap_func = trapezoid_funcs[member]
         if member == "Daniel":
-            result = trap_func(x_points, y_points, h)
+            result = trap_func(x_sorted, y_sorted, h)
         elif member == "Francis":
-            x_np = np.round(np.array(x_points, dtype=float), 1)
-            y_np = np.round(np.array(y_points, dtype=float), 5)
+            x_np = np.round(np.array(x_sorted, dtype=float), 1)
+            y_np = np.round(np.array(y_sorted, dtype=float), 5)
             h = round((x_np[-1] - x_np[0]) / (len(x_np) - 1), 1)
             result = trap_func(x_np, y_np, h)
         elif member == "Jhon":
-            x_np = np.array(x_points, dtype=float)
-            y_np = np.array(y_points, dtype=float)
+            x_np = np.array(x_sorted, dtype=float)
+            y_np = np.array(y_sorted, dtype=float)
             x_np = np.round(x_np, 3)
             y_np = np.round(y_np, 3)
             h = float(np.round((x_np[-1] - x_np[0]) / (len(x_np) - 1), 3))
             result = trap_func(x_np, y_np, h)
         elif member == "Mark":
-            x_np = np.array(x_points, dtype=float)
-            y_np = np.array(y_points, dtype=float)
+            x_np = np.array(x_sorted, dtype=float)
+            y_np = np.array(y_sorted, dtype=float)
             h = float((x_np[-1] - x_np[0]) / (len(x_np) - 1))
             if len(x_np) <= 3:
                 result = trap_func(x_np, y_np, h)  
@@ -364,17 +387,39 @@ if result is not None:
     # 1) Reserve a spot ABOVE the controls for the graph
     graph_ph = st.empty()
 
-    # 2) Controls BELOW the graph
-    st.subheader("Graph Window Settings")
+    # --- Compute fresh default window correctly ---
     default_xmin, default_xmax = float(min(x_points)), float(max(x_points))
-    x_range = default_xmax - default_xmin if default_xmax != default_xmin else 1
+    default_ymin, default_ymax = float(min(y_points)), float(max(y_points))
+
+    y_range = default_ymax - default_ymin if default_ymax != default_ymin else 1.0
+    x_range = default_xmax - default_xmin if default_xmax != default_xmin else 1.0
+
+    # Add a small 5% x margin and 10% y margin
     default_xmin -= 0.05 * x_range
     default_xmax += 0.05 * x_range
-
-    default_ymin, default_ymax = float(min(y_points)), float(max(y_points))
-    y_range = default_ymax - default_ymin if default_ymax != default_ymin else 1
     default_ymin -= 0.1 * y_range
     default_ymax += 0.1 * y_range
+
+    # --- Floor/Ceil defaults (cleaner numbers) ---
+    init_x_min = math.floor(default_xmin)
+    init_x_max = math.ceil(default_xmax)
+    init_y_min = math.floor(default_ymin)
+    init_y_max = math.ceil(default_ymax)
+
+    # --- Reset window when data changes ---
+    axes_sig = (
+        operation,
+        len(x_points),
+        float(min(x_points)), float(max(x_points)),
+        len(y_points),
+        float(min(y_points)), float(max(y_points))
+    )
+    if "axes_sig" not in st.session_state or st.session_state.axes_sig != axes_sig:
+        st.session_state.axes_sig = axes_sig
+        st.session_state.x_min_num = init_x_min
+        st.session_state.x_max_num = init_x_max
+        st.session_state.y_min_num = init_y_min
+        st.session_state.y_max_num = init_y_max
 
     # Create 2 columns, left for x, right for y
     col_left, col_right = st.columns(2)
